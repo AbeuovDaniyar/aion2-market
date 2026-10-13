@@ -1,0 +1,218 @@
+{
+ "total_items": 574,
+ "sections": [
+  {
+   "id": "weapons",
+   "name": "Weapons",
+   "description": "Main-hand weapons and guards",
+   "items": 186,
+   "categories": [
+    {
+     "id": 39,
+     "name": "Greatswords",
+     "items": 21
+    },
+    {
+     "id": 1,
+     "name": "Longswords",
+     "items": 21
+    },
+    {
+     "id": 3,
+     "name": "Daggers",
+     "items": 22
+    },
+    {
+     "id": 4,
+     "name": "Bows",
+     "items": 21
+    },
+    {
+     "id": 5,
+     "name": "Orbs",
+     "items": 19
+    },
+    {
+     "id": 40,
+     "name": "Spellbooks",
+     "items": 21
+    },
+    {
+     "id": 6,
+     "name": "Staves",
+     "items": 22
+    },
+    {
+     "id": 41,
+     "name": "Maces",
+     "items": 20
+    },
+    {
+     "id": 8,
+     "name": "Guards",
+     "items": 19
+    }
+   ]
+  },
+  {
+   "id": "armor",
+   "name": "Armor",
+   "description": "Helms, shoulders, body, legs, hands, feet and cloaks",
+   "items": 182,
+   "categories": [
+    {
+     "id": 12,
+     "name": "Helms",
+     "items": 27
+    },
+    {
+     "id": 42,
+     "name": "Pauldrons",
+     "items": 21
+    },
+    {
+     "id": 9,
+     "name": "Breastplates",
+     "items": 24
+    },
+    {
+     "id": 10,
+     "name": "Greaves",
+     "items": 21
+    },
+    {
+     "id": 14,
+     "name": "Gloves",
+     "items": 27
+    },
+    {
+     "id": 15,
+     "name": "Boots",
+     "items": 30
+    },
+    {
+     "id": 11,
+     "name": "Cloaks",
+     "items": 32
+    }
+   ]
+  },
+  {
+   "id": "accessories",
+   "name": "Accessories",
+   "description": "Necklaces, earrings and rings",
+   "items": 22,
+   "categories": [
+    {
+     "id": 17,
+     "name": "Necklaces",
+     "items": 6
+    },
+    {
+     "id": 18,
+     "name": "Earrings",
+     "items": 7
+    },
+    {
+     "id": 19,
+     "name": "Rings",
+     "items": 9
+    }
+   ]
+  },
+  {
+   "id": "consumables",
+   "name": "Consumables & collectibles",
+   "description": "Potions, food, scrolls, stones, wings and other usable items",
+   "items": 55,
+   "categories": [
+    {
+     "id": 29,
+     "name": "Potions & serums",
+     "items": 7
+    },
+    {
+     "id": 45,
+     "name": "Food",
+     "items": 15
+    },
+    {
+     "id": 30,
+     "name": "Scrolls",
+     "items": 4
+    },
+    {
+     "id": 50,
+     "name": "Manastones & soulstones",
+     "items": 9
+    },
+    {
+     "id": 49,
+     "name": "Transformation candy",
+     "items": 2
+    },
+    {
+     "id": 51,
+     "name": "Wings",
+     "items": 4
+    },
+    {
+     "id": 52,
+     "name": "Artwork",
+     "items": 12
+    },
+    {
+     "id": 33,
+     "name": "Other items",
+     "items": 2
+    }
+   ]
+  },
+  {
+   "id": "skins",
+   "name": "Skins",
+   "description": "Appearance items for armor and accessories",
+   "items": 44,
+   "categories": [
+    {
+     "id": 59,
+     "name": "Armor skins",
+     "items": 30
+    },
+    {
+     "id": 60,
+     "name": "Accessory skins",
+     "items": 14
+    }
+   ]
+  },
+  {
+   "id": "materials",
+   "name": "Materials",
+   "description": "Gathered resources and crafting materials",
+   "items": 85,
+   "categories": [
+    {
+     "id": 53,
+     "name": "Gathered resources",
+     "items": 46
+    },
+    {
+     "id": 54,
+     "name": "Crafting materials",
+     "items": 32
+    },
+    {
+     "id": 55,
+     "name": "Sealed wings",
+     "items": 6
+    },
+    {
+     "id": 46,
+     "name": "Amplify stones",
+     "items": 1
+    }
+   ]
+  }
+ ]
+}

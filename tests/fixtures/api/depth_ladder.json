@@ -1,0 +1,240 @@
+{
+ "item_key": 610610013,
+ "captured_at": "2026-10-06T11:52:00.787000Z",
+ "complete": true,
+ "listings_total": 42,
+ "units_total": 7320,
+ "levels": [
+  {
+   "unit_price": 4088.0,
+   "listings": 2,
+   "units": 620,
+   "cum_units": 620,
+   "cum_cost": 2534560.0
+  },
+  {
+   "unit_price": 4100.0,
+   "listings": 1,
+   "units": 200,
+   "cum_units": 820,
+   "cum_cost": 3354560.0
+  },
+  {
+   "unit_price": 4455.0,
+   "listings": 1,
+   "units": 913,
+   "cum_units": 1733,
+   "cum_cost": 7421975.0
+  },
+  {
+   "unit_price": 4500.0,
+   "listings": 1,
+   "units": 1000,
+   "cum_units": 2733,
+   "cum_cost": 11921975.0
+  },
+  {
+   "unit_price": 4600.0,
+   "listings": 1,
+   "units": 180,
+   "cum_units": 2913,
+   "cum_cost": 12749975.0
+  },
+  {
+   "unit_price": 4800.0,
+   "listings": 2,
+   "units": 300,
+   "cum_units": 3213,
+   "cum_cost": 14189975.0
+  },
+  {
+   "unit_price": 4898.0,
+   "listings": 1,
+   "units": 152,
+   "cum_units": 3365,
+   "cum_cost": 14934471.0
+  },
+  {
+   "unit_price": 4949.0,
+   "listings": 3,
+   "units": 1328,
+   "cum_units": 4693,
+   "cum_cost": 21506743.0
+  },
+  {
+   "unit_price": 5000.0,
+   "listings": 1,
+   "units": 666,
+   "cum_units": 5359,
+   "cum_cost": 24836743.0
+  },
+  {
+   "unit_price": 5080.0,
+   "listings": 1,
+   "units": 128,
+   "cum_units": 5487,
+   "cum_cost": 25486983.0
+  },
+  {
+   "unit_price": 5444.0,
+   "listings": 1,
+   "units": 163,
+   "cum_units": 5650,
+   "cum_cost": 26374355.0
+  },
+  {
+   "unit_price": 5800.0,
+   "listings": 1,
+   "units": 150,
+   "cum_units": 5800,
+   "cum_cost": 27244355.0
+  },
+  {
+   "unit_price": 6000.0,
+   "listings": 1,
+   "units": 130,
+   "cum_units": 5930,
+   "cum_cost": 28024355.0
+  },
+  {
+   "unit_price": 6888.0,
+   "listings": 1,
+   "units": 665,
+   "cum_units": 6595,
+   "cum_cost": 32604875.0
+  },
+  {
+   "unit_price": 7000.0,
+   "listings": 1,
+   "units": 89,
+   "cum_units": 6684,
+   "cum_cost": 33227875.0
+  },
+  {
+   "unit_price": 8000.0,
+   "listings": 1,
+   "units": 74,
+   "cum_units": 6758,
+   "cum_cost": 33819875.0
+  },
+  {
+   "unit_price": 8200.0,
+   "listings": 1,
+   "units": 134,
+   "cum_units": 6892,
+   "cum_cost": 34918675.0
+  },
+  {
+   "unit_price": 8399.0,
+   "listings": 1,
+   "units": 73,
+   "cum_units": 6965,
+   "cum_cost": 35531802.0
+  },
+  {
+   "unit_price": 8874.0,
+   "listings": 1,
+   "units": 76,
+   "cum_units": 7041,
+   "cum_cost": 36206226.0
+  },
+  {
+   "unit_price": 11999.0,
+   "listings": 1,
+   "units": 5,
+   "cum_units": 7046,
+   "cum_cost": 36266221.0
+  },
+  {
+   "unit_price": 15000.0,
+   "listings": 1,
+   "units": 222,
+   "cum_units": 7268,
+   "cum_cost": 39596221.0
+  },
+  {
+   "unit_price": 44444.0,
+   "listings": 1,
+   "units": 1,
+   "cum_units": 7269,
+   "cum_cost": 39640665.0
+  },
+  {
+   "unit_price": 48000.0,
+   "listings": 1,
+   "units": 31,
+   "cum_units": 7300,
+   "cum_cost": 41128665.0
+  },
+  {
+   "unit_price": 499599.0,
+   "listings": 1,
+   "units": 4,
+   "cum_units": 7304,
+   "cum_cost": 43127061.0
+  },
+  {
+   "unit_price": 599999.0,
+   "listings": 1,
+   "units": 1,
+   "cum_units": 7305,
+   "cum_cost": 43727060.0
+  },
+  {
+   "unit_price": 650000.0,
+   "listings": 1,
+   "units": 1,
+   "cum_units": 7306,
+   "cum_cost": 44377060.0
+  },
+  {
+   "unit_price": 780000.0,
+   "listings": 1,
+   "units": 1,
+   "cum_units": 7307,
+   "cum_cost": 45157060.0
+  },
+  {
+   "unit_price": 800000.0,
+   "listings": 1,
+   "units": 1,
+   "cum_units": 7308,
+   "cum_cost": 45957060.0
+  },
+  {
+   "unit_price": 850000.0,
+   "listings": 1,
+   "units": 1,
+   "cum_units": 7309,
+   "cum_cost": 46807060.0
+  },
+  {
+   "unit_price": 899999.0,
+   "listings": 1,
+   "units": 1,
+   "cum_units": 7310,
+   "cum_cost": 47707059.0
+  },
+  {
+   "unit_price": 900000.0,
+   "listings": 2,
+   "units": 2,
+   "cum_units": 7312,
+   "cum_cost": 49507059.0
+  },
+  {
+   "unit_price": 1000000.0,
+   "listings": 5,
+   "units": 7,
+   "cum_units": 7319,
+   "cum_cost": 56507059.0
+  },
+  {
+   "unit_price": 1337000.0,
+   "listings": 1,
+   "units": 1,
+   "cum_units": 7320,
+   "cum_cost": 57844059.0
+  }
+ ]
+}

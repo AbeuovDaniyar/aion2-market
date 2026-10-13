@@ -1,0 +1,120 @@
+{
+ "total": 5,
+ "limit": 50,
+ "offset": 0,
+ "sort": "name",
+ "order": "asc",
+ "window": "24h",
+ "items": [
+  {
+   "item_key": 610610014,
+   "name": "Fine Odyle",
+   "category": {
+    "id": 53,
+    "name": "Gathered resources",
+    "section_id": "materials",
+    "section_name": "Materials"
+   },
+   "group": "Odyle",
+   "price": 1195.0,
+   "listings": 74,
+   "captured_at": "2026-10-13T02:05:21.591000Z",
+   "change_pct": 19.61961961961962,
+   "change_basis_seconds": 82800,
+   "units_sold": 484336,
+   "sold_avg_price": 1419.0,
+   "sold_min_price": 450.0,
+   "sold_max_price": 9676.0,
+   "stats_registered": "2026-10-12T15:00:00Z",
+   "stats_fetched_at": "2026-10-12T15:12:06.565366Z"
+  },
+  {
+   "item_key": 610610013,
+   "name": "Odyle",
+   "category": {
+    "id": 53,
+    "name": "Gathered resources",
+    "section_id": "materials",
+    "section_name": "Materials"
+   },
+   "group": "Odyle",
+   "price": 1185.0,
+   "listings": 194,
+   "captured_at": "2026-10-13T02:05:21.591000Z",
+   "change_pct": -3.027823240589198,
+   "change_basis_seconds": 82800,
+   "units_sold": 1960380,
+   "sold_avg_price": 1999.0,
+   "sold_min_price": 100.0,
+   "sold_max_price": 9000.0,
+   "stats_registered": "2026-10-12T15:00:00Z",
+   "stats_fetched_at": "2026-10-12T15:12:04.706883Z"
+  },
+  {
+   "item_key": 610620013,
+   "name": "Orichalcum Ore",
+   "category": {
+    "id": 53,
+    "name": "Gathered resources",
+    "section_id": "materials",
+    "section_name": "Materials"
+   },
+   "group": "Orichalcum Ore",
+   "price": 1140.0,
+   "listings": 26,
+   "captured_at": "2026-10-13T02:05:21.591000Z",
+   "change_pct": 11.764705882352942,
+   "change_basis_seconds": 82800,
+   "units_sold": 902608,
+   "sold_avg_price": 1490.0,
+   "sold_min_price": 100.0,
+   "sold_max_price": 5110.0,
+   "stats_registered": "2026-10-12T15:00:00Z",
+   "stats_fetched_at": "2026-10-12T15:12:12.102046Z"
+  },
+  {
+   "item_key": 610530001,
+   "name": "Refining Stone",
+   "category": {
+    "id": 54,
+    "name": "Crafting materials",
+    "section_id": "materials",
+    "section_name": "Materials"
+   },
+   "group": "Refining Stone",
+   "price": 1700.0,
+   "listings": 94,
+   "captured_at": "2026-10-13T02:05:21.591000Z",
+   "change_pct": -43.1438127090301,
+   "change_basis_seconds": 82800,
+   "units_sold": 492872,
+   "sold_avg_price": 3330.0,
+   "sold_min_price": 1600.0,
+   "sold_max_price": 7500.0,
+   "stats_registered": "2026-10-12T15:00:00Z",
+   "stats_fetched_at": "2026-10-12T15:11:51.306905Z"
+  },
+  {
+   "item_key": 610660025,
+   "name": "Sapphire Gemstone",
+   "category": {
+    "id": 53,
+    "name": "Gathered resources",
+    "section_id": "materials",
+    "section_name": "Materials"
+   },
+   "group": "Sapphire Gemstone",
+   "price": 1200.0,
+   "listings": 16,
+   "captured_at": "2026-10-13T02:05:21.591000Z",
+   "change_pct": 0.1669449081803005,
+   "change_basis_seconds": 82800,
+   "units_sold": 221415,
+   "sold_avg_price": 1500.0,
+   "sold_min_price": 800.0,
+   "sold_max_price": 3800.0,
+   "stats_registered": "2026-10-12T15:00:00Z",
+   "stats_fetched_at": "2026-10-12T15:12:33.591281Z"
+  }
+ ]
+}

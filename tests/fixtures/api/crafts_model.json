@@ -1,0 +1,1534 @@
+{
+ "server_id": 11304,
+ "race": "Light",
+ "model": {
+  "model_id": 2,
+  "algorithm_version": 2,
+  "mastery": 100,
+  "carry_hours": 6,
+  "source": "game files, AION2 5.3.2.0 (usmap AION2-5.3.2.0-2.0.5.0.2026100501); Data/Table CraftRecipe + ConversionRecipe + CraftComponentReplacement + ConversionComponentReplacement + ComponentCombine; CraftRecipeRate; the NPC shops and the conversions",
+  "created_at": "2026-10-11T08:03:45.441867Z"
+ },
+ "profiles": [
+  {
+   "profile": "weapon:orichalcum-dagger+orichalcum-greatsword+orichalcum-guard+orichalcum-longsword+orichalcum-mace",
+   "label": "Orichalcum weapons",
+   "category": "Weapon",
+   "skill": "Blacksmithing",
+   "members": [
+    {
+     "target_key": 110130013,
+     "name": "Artisan's Splendent Orichalcum Greatsword"
+    },
+    {
+     "target_key": 110230013,
+     "name": "Artisan's Splendent Orichalcum Longsword"
+    },
+    {
+     "target_key": 110330013,
+     "name": "Artisan's Splendent Orichalcum Dagger"
+    },
+    {
+     "target_key": 110730013,
+     "name": "Artisan's Splendent Orichalcum Mace"
+    },
+    {
+     "target_key": 115030013,
+     "name": "Artisan's Splendent Orichalcum Guard"
+    }
+   ],
+   "steps": [
+    {
+     "step_no": 1,
+     "mastery_level": 3,
+     "success_rate": 0.93121326,
+     "combo_probability": 0.25,
+     "attempts": 74.9965811237252,
+     "materials": [
+      {
+       "material_key": 610530001,
+       "name": "Refining Stone",
+       "per_attempt": 5
+      },
+      {
+       "material_key": 610610013,
+       "name": "Odyle",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610710001,
+       "name": "Orichalcum Ingot",
+       "per_attempt": 3
+      }
+     ]
+    },
+    {
+     "step_no": 2,
+     "mastery_level": 15,
+     "success_rate": 0.94633946,
+     "combo_probability": 0.25,
+     "attempts": 17.4594526992697,
+     "materials": [
+      {
+       "material_key": 610530005,
+       "name": "Expert's Refining Stone",
+       "per_attempt": 5
+      },
+      {
+       "material_key": 610610014,
+       "name": "Fine Odyle",
+       "per_attempt": 3
+      },
+      {
+       "material_key": 610620014,
+       "name": "Fine Orichalcum Ore",
+       "per_attempt": 6
+      }
+     ]
+    },
+    {
+     "step_no": 3,
+     "mastery_level": 30,
+     "success_rate": 0.96837241,
+     "combo_probability": 0.25,
+     "attempts": 4.1306422598306,
+     "materials": [
+      {
+       "material_key": 610530008,
+       "name": "Artisan's Refining Stone",
+       "per_attempt": 5
+      },
+      {
+       "material_key": 610610015,
+       "name": "Pure Odyle",
+       "per_attempt": 4
+      },
+      {
+       "material_key": 610620015,
+       "name": "Pure Orichalcum Ore",
+       "per_attempt": 8
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "weapon:yggdrasil-bow+yggdrasil-staff",
+   "label": "Yggdrasil Bow / Staff",
+   "category": "Weapon",
+   "skill": "Jewelcrafting",
+   "members": [
+    {
+     "target_key": 110430013,
+     "name": "Artisan's Splendent Yggdrasil Bow"
+    },
+    {
+     "target_key": 110830013,
+     "name": "Artisan's Splendent Yggdrasil Staff"
+    }
+   ],
+   "steps": [
+    {
+     "step_no": 1,
+     "mastery_level": 3,
+     "success_rate": 0.93121326,
+     "combo_probability": 0.25,
+     "attempts": 74.9965811237252,
+     "materials": [
+      {
+       "material_key": 610530001,
+       "name": "Refining Stone",
+       "per_attempt": 5
+      },
+      {
+       "material_key": 610610013,
+       "name": "Odyle",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610730006,
+       "name": "Yggdrasil Wood",
+       "per_attempt": 3
+      }
+     ]
+    },
+    {
+     "step_no": 2,
+     "mastery_level": 15,
+     "success_rate": 0.94633946,
+     "combo_probability": 0.25,
+     "attempts": 17.4594526992697,
+     "materials": [
+      {
+       "material_key": 610530005,
+       "name": "Expert's Refining Stone",
+       "per_attempt": 5
+      },
+      {
+       "material_key": 610610014,
+       "name": "Fine Odyle",
+       "per_attempt": 3
+      },
+      {
+       "material_key": 610650013,
+       "name": "Fine Yggdrasil Log",
+       "per_attempt": 6
+      }
+     ]
+    },
+    {
+     "step_no": 3,
+     "mastery_level": 30,
+     "success_rate": 0.96837241,
+     "combo_probability": 0.25,
+     "attempts": 4.1306422598306,
+     "materials": [
+      {
+       "material_key": 610530008,
+       "name": "Artisan's Refining Stone",
+       "per_attempt": 5
+      },
+      {
+       "material_key": 610610015,
+       "name": "Pure Odyle",
+       "per_attempt": 4
+      },
+      {
+       "material_key": 610650015,
+       "name": "Pure Yggdrasil Log",
+       "per_attempt": 8
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "weapon:truth-spellbook",
+   "label": "Truth Spellbook",
+   "category": "Weapon",
+   "skill": "Alchemy",
+   "members": [
+    {
+     "target_key": 110530013,
+     "name": "Artisan's Splendent Truth Spellbook"
+    }
+   ],
+   "steps": [
+    {
+     "step_no": 1,
+     "mastery_level": 3,
+     "success_rate": 0.93121326,
+     "combo_probability": 0.25,
+     "attempts": 74.9965811237252,
+     "materials": [
+      {
+       "material_key": 610530001,
+       "name": "Refining Stone",
+       "per_attempt": 5
+      },
+      {
+       "material_key": 610610013,
+       "name": "Odyle",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610740015,
+       "name": "Magic Crystal",
+       "per_attempt": 3
+      }
+     ]
+    },
+    {
+     "step_no": 2,
+     "mastery_level": 15,
+     "success_rate": 0.94633946,
+     "combo_probability": 0.25,
+     "attempts": 17.4594526992697,
+     "materials": [
+      {
+       "material_key": 610530005,
+       "name": "Expert's Refining Stone",
+       "per_attempt": 5
+      },
+      {
+       "material_key": 610610014,
+       "name": "Fine Odyle",
+       "per_attempt": 3
+      },
+      {
+       "material_key": 610660030,
+       "name": "Fine Ruby Gemstone",
+       "per_attempt": 6
+      }
+     ]
+    },
+    {
+     "step_no": 3,
+     "mastery_level": 30,
+     "success_rate": 0.96837241,
+     "combo_probability": 0.25,
+     "attempts": 4.1306422598306,
+     "materials": [
+      {
+       "material_key": 610530008,
+       "name": "Artisan's Refining Stone",
+       "per_attempt": 5
+      },
+      {
+       "material_key": 610610015,
+       "name": "Pure Odyle",
+       "per_attempt": 4
+      },
+      {
+       "material_key": 610660033,
+       "name": "Pure Ruby Gemstone",
+       "per_attempt": 8
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "weapon:truth-orb",
+   "label": "Truth Orb",
+   "category": "Weapon",
+   "skill": "Alchemy",
+   "members": [
+    {
+     "target_key": 110630013,
+     "name": "Artisan's Splendent Truth Orb"
+    }
+   ],
+   "steps": [
+    {
+     "step_no": 1,
+     "mastery_level": 3,
+     "success_rate": 0.93121326,
+     "combo_probability": 0.25,
+     "attempts": 74.9965811237252,
+     "materials": [
+      {
+       "material_key": 610530001,
+       "name": "Refining Stone",
+       "per_attempt": 5
+      },
+      {
+       "material_key": 610610013,
+       "name": "Odyle",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610740015,
+       "name": "Magic Crystal",
+       "per_attempt": 3
+      }
+     ]
+    },
+    {
+     "step_no": 2,
+     "mastery_level": 15,
+     "success_rate": 0.94633946,
+     "combo_probability": 0.25,
+     "attempts": 17.4594526992697,
+     "materials": [
+      {
+       "material_key": 610530005,
+       "name": "Expert's Refining Stone",
+       "per_attempt": 5
+      },
+      {
+       "material_key": 610610014,
+       "name": "Fine Odyle",
+       "per_attempt": 3
+      },
+      {
+       "material_key": 610660028,
+       "name": "Fine Sapphire Gemstone",
+       "per_attempt": 6
+      }
+     ]
+    },
+    {
+     "step_no": 3,
+     "mastery_level": 30,
+     "success_rate": 0.96837241,
+     "combo_probability": 0.25,
+     "attempts": 4.1306422598306,
+     "materials": [
+      {
+       "material_key": 610530008,
+       "name": "Artisan's Refining Stone",
+       "per_attempt": 5
+      },
+      {
+       "material_key": 610610015,
+       "name": "Pure Odyle",
+       "per_attempt": 4
+      },
+      {
+       "material_key": 610660031,
+       "name": "Pure Sapphire Gemstone",
+       "per_attempt": 8
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "armor:orichalcum-breastplate",
+   "label": "Orichalcum Breastplate",
+   "category": "Armor",
+   "skill": "Tailoring",
+   "members": [
+    {
+     "target_key": 210130013,
+     "name": "Artisan's Splendent Orichalcum Breastplate"
+    }
+   ],
+   "steps": [
+    {
+     "step_no": 1,
+     "mastery_level": 3,
+     "success_rate": 0.93121326,
+     "combo_probability": 0.25,
+     "attempts": 74.9965811237252,
+     "materials": [
+      {
+       "material_key": 610530001,
+       "name": "Refining Stone",
+       "per_attempt": 3
+      },
+      {
+       "material_key": 610610013,
+       "name": "Odyle",
+       "per_attempt": 1
+      },
+      {
+       "material_key": 610710001,
+       "name": "Orichalcum Ingot",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610720011,
+       "name": "Strong Leather",
+       "per_attempt": 4
+      }
+     ]
+    },
+    {
+     "step_no": 2,
+     "mastery_level": 15,
+     "success_rate": 0.94633946,
+     "combo_probability": 0.25,
+     "attempts": 17.4594526992697,
+     "materials": [
+      {
+       "material_key": 610530005,
+       "name": "Expert's Refining Stone",
+       "per_attempt": 3
+      },
+      {
+       "material_key": 610610014,
+       "name": "Fine Odyle",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610620014,
+       "name": "Fine Orichalcum Ore",
+       "per_attempt": 4
+      }
+     ]
+    },
+    {
+     "step_no": 3,
+     "mastery_level": 30,
+     "success_rate": 0.96837241,
+     "combo_probability": 0.25,
+     "attempts": 4.1306422598306,
+     "materials": [
+      {
+       "material_key": 610530008,
+       "name": "Artisan's Refining Stone",
+       "per_attempt": 3
+      },
+      {
+       "material_key": 610610015,
+       "name": "Pure Odyle",
+       "per_attempt": 3
+      },
+      {
+       "material_key": 610620015,
+       "name": "Pure Orichalcum Ore",
+       "per_attempt": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "armor:orichalcum-greaves",
+   "label": "Orichalcum Greaves",
+   "category": "Armor",
+   "skill": "Tailoring",
+   "members": [
+    {
+     "target_key": 210230013,
+     "name": "Artisan's Splendent Orichalcum Greaves"
+    }
+   ],
+   "steps": [
+    {
+     "step_no": 1,
+     "mastery_level": 3,
+     "success_rate": 0.93121326,
+     "combo_probability": 0.25,
+     "attempts": 74.9965811237252,
+     "materials": [
+      {
+       "material_key": 610530001,
+       "name": "Refining Stone",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610610013,
+       "name": "Odyle",
+       "per_attempt": 1
+      },
+      {
+       "material_key": 610710001,
+       "name": "Orichalcum Ingot",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610720011,
+       "name": "Strong Leather",
+       "per_attempt": 3
+      }
+     ]
+    },
+    {
+     "step_no": 2,
+     "mastery_level": 15,
+     "success_rate": 0.94633946,
+     "combo_probability": 0.25,
+     "attempts": 17.4594526992697,
+     "materials": [
+      {
+       "material_key": 610530005,
+       "name": "Expert's Refining Stone",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610610014,
+       "name": "Fine Odyle",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610620014,
+       "name": "Fine Orichalcum Ore",
+       "per_attempt": 3
+      }
+     ]
+    },
+    {
+     "step_no": 3,
+     "mastery_level": 30,
+     "success_rate": 0.96837241,
+     "combo_probability": 0.25,
+     "attempts": 4.1306422598306,
+     "materials": [
+      {
+       "material_key": 610530008,
+       "name": "Artisan's Refining Stone",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610610015,
+       "name": "Pure Odyle",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610620015,
+       "name": "Pure Orichalcum Ore",
+       "per_attempt": 4
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "armor:orichalcum-boots+orichalcum-helm+orichalcum-pauldrons",
+   "label": "Orichalcum Boots / Helm / Pauldrons",
+   "category": "Armor",
+   "skill": "Tailoring",
+   "members": [
+    {
+     "target_key": 210330013,
+     "name": "Artisan's Splendent Orichalcum Helm"
+    },
+    {
+     "target_key": 210430013,
+     "name": "Artisan's Splendent Orichalcum Pauldrons"
+    },
+    {
+     "target_key": 210630013,
+     "name": "Artisan's Splendent Orichalcum Boots"
+    }
+   ],
+   "steps": [
+    {
+     "step_no": 1,
+     "mastery_level": 3,
+     "success_rate": 0.93121326,
+     "combo_probability": 0.25,
+     "attempts": 74.9965811237252,
+     "materials": [
+      {
+       "material_key": 610530001,
+       "name": "Refining Stone",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610610013,
+       "name": "Odyle",
+       "per_attempt": 1
+      },
+      {
+       "material_key": 610710001,
+       "name": "Orichalcum Ingot",
+       "per_attempt": 1
+      },
+      {
+       "material_key": 610720011,
+       "name": "Strong Leather",
+       "per_attempt": 3
+      }
+     ]
+    },
+    {
+     "step_no": 2,
+     "mastery_level": 15,
+     "success_rate": 0.94633946,
+     "combo_probability": 0.25,
+     "attempts": 17.4594526992697,
+     "materials": [
+      {
+       "material_key": 610530005,
+       "name": "Expert's Refining Stone",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610610014,
+       "name": "Fine Odyle",
+       "per_attempt": 1
+      },
+      {
+       "material_key": 610620014,
+       "name": "Fine Orichalcum Ore",
+       "per_attempt": 3
+      }
+     ]
+    },
+    {
+     "step_no": 3,
+     "mastery_level": 30,
+     "success_rate": 0.96837241,
+     "combo_probability": 0.25,
+     "attempts": 4.1306422598306,
+     "materials": [
+      {
+       "material_key": 610530008,
+       "name": "Artisan's Refining Stone",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610610015,
+       "name": "Pure Odyle",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610620015,
+       "name": "Pure Orichalcum Ore",
+       "per_attempt": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "armor:orichalcum-cloak+orichalcum-gloves",
+   "label": "Orichalcum Cloak / Gloves",
+   "category": "Armor",
+   "skill": "Tailoring",
+   "members": [
+    {
+     "target_key": 210530013,
+     "name": "Artisan's Splendent Orichalcum Gloves"
+    },
+    {
+     "target_key": 210730013,
+     "name": "Artisan's Splendent Orichalcum Cloak"
+    }
+   ],
+   "steps": [
+    {
+     "step_no": 1,
+     "mastery_level": 5,
+     "success_rate": 0.93121326,
+     "combo_probability": 0.25,
+     "attempts": 74.9965811237252,
+     "materials": [
+      {
+       "material_key": 610530001,
+       "name": "Refining Stone",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610610013,
+       "name": "Odyle",
+       "per_attempt": 1
+      },
+      {
+       "material_key": 610710001,
+       "name": "Orichalcum Ingot",
+       "per_attempt": 1
+      },
+      {
+       "material_key": 610720011,
+       "name": "Strong Leather",
+       "per_attempt": 2
+      }
+     ]
+    },
+    {
+     "step_no": 2,
+     "mastery_level": 20,
+     "success_rate": 0.94633946,
+     "combo_probability": 0.25,
+     "attempts": 17.4594526992697,
+     "materials": [
+      {
+       "material_key": 610530005,
+       "name": "Expert's Refining Stone",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610610014,
+       "name": "Fine Odyle",
+       "per_attempt": 1
+      },
+      {
+       "material_key": 610620014,
+       "name": "Fine Orichalcum Ore",
+       "per_attempt": 2
+      }
+     ]
+    },
+    {
+     "step_no": 3,
+     "mastery_level": 35,
+     "success_rate": 0.96837241,
+     "combo_probability": 0.25,
+     "attempts": 4.1306422598306,
+     "materials": [
+      {
+       "material_key": 610530008,
+       "name": "Artisan's Refining Stone",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610610015,
+       "name": "Pure Odyle",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610620015,
+       "name": "Pure Orichalcum Ore",
+       "per_attempt": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "accessory:ruby-necklace",
+   "label": "Ruby Necklace",
+   "category": "Accessory",
+   "skill": "Jewelcrafting",
+   "members": [
+    {
+     "target_key": 310130013,
+     "name": "Artisan's Splendent Ruby Necklace"
+    }
+   ],
+   "steps": [
+    {
+     "step_no": 1,
+     "mastery_level": 10,
+     "success_rate": 0.93121326,
+     "combo_probability": 0.25,
+     "attempts": 74.9965811237252,
+     "materials": [
+      {
+       "material_key": 610530001,
+       "name": "Refining Stone",
+       "per_attempt": 4
+      },
+      {
+       "material_key": 610610013,
+       "name": "Odyle",
+       "per_attempt": 1
+      },
+      {
+       "material_key": 610730021,
+       "name": "Ruby Decoration",
+       "per_attempt": 1
+      }
+     ]
+    },
+    {
+     "step_no": 2,
+     "mastery_level": 25,
+     "success_rate": 0.94633946,
+     "combo_probability": 0.25,
+     "attempts": 17.4594526992697,
+     "materials": [
+      {
+       "material_key": 610530005,
+       "name": "Expert's Refining Stone",
+       "per_attempt": 4
+      },
+      {
+       "material_key": 610610014,
+       "name": "Fine Odyle",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610660030,
+       "name": "Fine Ruby Gemstone",
+       "per_attempt": 4
+      }
+     ]
+    },
+    {
+     "step_no": 3,
+     "mastery_level": 40,
+     "success_rate": 0.96837241,
+     "combo_probability": 0.25,
+     "attempts": 4.1306422598306,
+     "materials": [
+      {
+       "material_key": 610530008,
+       "name": "Artisan's Refining Stone",
+       "per_attempt": 4
+      },
+      {
+       "material_key": 610610015,
+       "name": "Pure Odyle",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610660033,
+       "name": "Pure Ruby Gemstone",
+       "per_attempt": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "accessory:diamond-earrings",
+   "label": "Diamond Earrings",
+   "category": "Accessory",
+   "skill": "Jewelcrafting",
+   "members": [
+    {
+     "target_key": 310230013,
+     "name": "Artisan's Splendent Diamond Earrings"
+    }
+   ],
+   "steps": [
+    {
+     "step_no": 1,
+     "mastery_level": 5,
+     "success_rate": 0.93121326,
+     "combo_probability": 0.25,
+     "attempts": 74.9965811237252,
+     "materials": [
+      {
+       "material_key": 610530001,
+       "name": "Refining Stone",
+       "per_attempt": 3
+      },
+      {
+       "material_key": 610610013,
+       "name": "Odyle",
+       "per_attempt": 1
+      },
+      {
+       "material_key": 610730020,
+       "name": "Diamond Decoration",
+       "per_attempt": 1
+      }
+     ]
+    },
+    {
+     "step_no": 2,
+     "mastery_level": 20,
+     "success_rate": 0.94633946,
+     "combo_probability": 0.25,
+     "attempts": 17.4594526992697,
+     "materials": [
+      {
+       "material_key": 610530005,
+       "name": "Expert's Refining Stone",
+       "per_attempt": 3
+      },
+      {
+       "material_key": 610610014,
+       "name": "Fine Odyle",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610660029,
+       "name": "Fine Diamond Gemstone",
+       "per_attempt": 3
+      }
+     ]
+    },
+    {
+     "step_no": 3,
+     "mastery_level": 35,
+     "success_rate": 0.96837241,
+     "combo_probability": 0.25,
+     "attempts": 4.1306422598306,
+     "materials": [
+      {
+       "material_key": 610530008,
+       "name": "Artisan's Refining Stone",
+       "per_attempt": 3
+      },
+      {
+       "material_key": 610610015,
+       "name": "Pure Odyle",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610660032,
+       "name": "Pure Diamond Gemstone",
+       "per_attempt": 4
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "profile": "accessory:sapphire-ring",
+   "label": "Sapphire Ring",
+   "category": "Accessory",
+   "skill": "Jewelcrafting",
+   "members": [
+    {
+     "target_key": 310330013,
+     "name": "Artisan's Splendent Sapphire Ring"
+    }
+   ],
+   "steps": [
+    {
+     "step_no": 1,
+     "mastery_level": 3,
+     "success_rate": 0.93121326,
+     "combo_probability": 0.25,
+     "attempts": 74.9965811237252,
+     "materials": [
+      {
+       "material_key": 610530001,
+       "name": "Refining Stone",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610610013,
+       "name": "Odyle",
+       "per_attempt": 1
+      },
+      {
+       "material_key": 610730016,
+       "name": "Sapphire Decoration",
+       "per_attempt": 1
+      }
+     ]
+    },
+    {
+     "step_no": 2,
+     "mastery_level": 15,
+     "success_rate": 0.94633946,
+     "combo_probability": 0.25,
+     "attempts": 17.4594526992697,
+     "materials": [
+      {
+       "material_key": 610530005,
+       "name": "Expert's Refining Stone",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610610014,
+       "name": "Fine Odyle",
+       "per_attempt": 1
+      },
+      {
+       "material_key": 610660028,
+       "name": "Fine Sapphire Gemstone",
+       "per_attempt": 2
+      }
+     ]
+    },
+    {
+     "step_no": 3,
+     "mastery_level": 30,
+     "success_rate": 0.96837241,
+     "combo_probability": 0.25,
+     "attempts": 4.1306422598306,
+     "materials": [
+      {
+       "material_key": 610530008,
+       "name": "Artisan's Refining Stone",
+       "per_attempt": 2
+      },
+      {
+       "material_key": 610610015,
+       "name": "Pure Odyle",
+       "per_attempt": 1
+      },
+      {
+       "material_key": 610660031,
+       "name": "Pure Sapphire Gemstone",
+       "per_attempt": 3
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "routes": [
+  {
+   "material_key": 610620014,
+   "name": "Fine Orichalcum Ore",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "morph",
+     "recipe_id": 11015001,
+     "leaves": [
+      {
+       "item_key": 610610014,
+       "name": "Fine Odyle",
+       "per_unit": 1.0,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610620015,
+   "name": "Pure Orichalcum Ore",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "morph",
+     "recipe_id": 11014001,
+     "leaves": [
+      {
+       "item_key": 610610015,
+       "name": "Pure Odyle",
+       "per_unit": 1.0,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610650013,
+   "name": "Fine Yggdrasil Log",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "morph",
+     "recipe_id": 11055001,
+     "leaves": [
+      {
+       "item_key": 610610014,
+       "name": "Fine Odyle",
+       "per_unit": 1.0,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610650015,
+   "name": "Pure Yggdrasil Log",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "morph",
+     "recipe_id": 11054001,
+     "leaves": [
+      {
+       "item_key": 610610015,
+       "name": "Pure Odyle",
+       "per_unit": 1.0,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610660028,
+   "name": "Fine Sapphire Gemstone",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "morph",
+     "recipe_id": 11065001,
+     "leaves": [
+      {
+       "item_key": 610610014,
+       "name": "Fine Odyle",
+       "per_unit": 1.0,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610660029,
+   "name": "Fine Diamond Gemstone",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "morph",
+     "recipe_id": 11065002,
+     "leaves": [
+      {
+       "item_key": 610610014,
+       "name": "Fine Odyle",
+       "per_unit": 1.0,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610660030,
+   "name": "Fine Ruby Gemstone",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "morph",
+     "recipe_id": 11065003,
+     "leaves": [
+      {
+       "item_key": 610610014,
+       "name": "Fine Odyle",
+       "per_unit": 1.0,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610660031,
+   "name": "Pure Sapphire Gemstone",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "morph",
+     "recipe_id": 11064001,
+     "leaves": [
+      {
+       "item_key": 610610015,
+       "name": "Pure Odyle",
+       "per_unit": 1.0,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610660032,
+   "name": "Pure Diamond Gemstone",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "morph",
+     "recipe_id": 11064002,
+     "leaves": [
+      {
+       "item_key": 610610015,
+       "name": "Pure Odyle",
+       "per_unit": 1.0,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610660033,
+   "name": "Pure Ruby Gemstone",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "morph",
+     "recipe_id": 11064003,
+     "leaves": [
+      {
+       "item_key": 610610015,
+       "name": "Pure Odyle",
+       "per_unit": 1.0,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610710001,
+   "name": "Orichalcum Ingot",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "craft",
+     "recipe_id": 115016001,
+     "leaves": [
+      {
+       "item_key": 610620013,
+       "name": "Orichalcum Ore",
+       "per_unit": 2.01711294416474,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      },
+      {
+       "item_key": 630541001,
+       "name": "Orichalcum Solvent (Bound)",
+       "per_unit": 1.00855647208237,
+       "fixed_price": 400.0,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    },
+    {
+     "route_no": 2,
+     "method": "craft",
+     "recipe_id": 115016001,
+     "leaves": [
+      {
+       "item_key": 610610013,
+       "name": "Odyle",
+       "per_unit": 2.01711294416474,
+       "fixed_price": null,
+       "via_key": 610620013,
+       "via_name": "Orichalcum Ore"
+      },
+      {
+       "item_key": 630541001,
+       "name": "Orichalcum Solvent (Bound)",
+       "per_unit": 1.00855647208237,
+       "fixed_price": 400.0,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610720011,
+   "name": "Strong Leather",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "craft",
+     "recipe_id": 415016003,
+     "leaves": [
+      {
+       "item_key": 610530011,
+       "name": "Raw Leather",
+       "per_unit": 2.01711294416474,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610730006,
+   "name": "Yggdrasil Wood",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "craft",
+     "recipe_id": 215016007,
+     "leaves": [
+      {
+       "item_key": 610650011,
+       "name": "Yggdrasil Log",
+       "per_unit": 2.01711294416474,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      },
+      {
+       "item_key": 630542005,
+       "name": "Sandpaper (Bound)",
+       "per_unit": 1.00855647208237,
+       "fixed_price": 400.0,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    },
+    {
+     "route_no": 2,
+     "method": "craft",
+     "recipe_id": 215016007,
+     "leaves": [
+      {
+       "item_key": 610610013,
+       "name": "Odyle",
+       "per_unit": 2.01711294416474,
+       "fixed_price": null,
+       "via_key": 610650011,
+       "via_name": "Yggdrasil Log"
+      },
+      {
+       "item_key": 630542005,
+       "name": "Sandpaper (Bound)",
+       "per_unit": 1.00855647208237,
+       "fixed_price": 400.0,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610730016,
+   "name": "Sapphire Decoration",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "craft",
+     "recipe_id": 215016001,
+     "leaves": [
+      {
+       "item_key": 610660025,
+       "name": "Sapphire Gemstone",
+       "per_unit": 2.01711294416474,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      },
+      {
+       "item_key": 630542001,
+       "name": "Abrasive (Bound)",
+       "per_unit": 1.00855647208237,
+       "fixed_price": 400.0,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    },
+    {
+     "route_no": 2,
+     "method": "craft",
+     "recipe_id": 215016001,
+     "leaves": [
+      {
+       "item_key": 610610013,
+       "name": "Odyle",
+       "per_unit": 2.01711294416474,
+       "fixed_price": null,
+       "via_key": 610660025,
+       "via_name": "Sapphire Gemstone"
+      },
+      {
+       "item_key": 630542001,
+       "name": "Abrasive (Bound)",
+       "per_unit": 1.00855647208237,
+       "fixed_price": 400.0,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610730020,
+   "name": "Diamond Decoration",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "craft",
+     "recipe_id": 215016003,
+     "leaves": [
+      {
+       "item_key": 610660026,
+       "name": "Diamond Gemstone",
+       "per_unit": 2.01711294416474,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      },
+      {
+       "item_key": 630542001,
+       "name": "Abrasive (Bound)",
+       "per_unit": 1.00855647208237,
+       "fixed_price": 400.0,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    },
+    {
+     "route_no": 2,
+     "method": "craft",
+     "recipe_id": 215016003,
+     "leaves": [
+      {
+       "item_key": 610610013,
+       "name": "Odyle",
+       "per_unit": 2.01711294416474,
+       "fixed_price": null,
+       "via_key": 610660026,
+       "via_name": "Diamond Gemstone"
+      },
+      {
+       "item_key": 630542001,
+       "name": "Abrasive (Bound)",
+       "per_unit": 1.00855647208237,
+       "fixed_price": 400.0,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610730021,
+   "name": "Ruby Decoration",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "craft",
+     "recipe_id": 215016005,
+     "leaves": [
+      {
+       "item_key": 610660027,
+       "name": "Ruby Gemstone",
+       "per_unit": 2.01711294416474,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      },
+      {
+       "item_key": 630542001,
+       "name": "Abrasive (Bound)",
+       "per_unit": 1.00855647208237,
+       "fixed_price": 400.0,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    },
+    {
+     "route_no": 2,
+     "method": "craft",
+     "recipe_id": 215016005,
+     "leaves": [
+      {
+       "item_key": 610610013,
+       "name": "Odyle",
+       "per_unit": 2.01711294416474,
+       "fixed_price": null,
+       "via_key": 610660027,
+       "via_name": "Ruby Gemstone"
+      },
+      {
+       "item_key": 630542001,
+       "name": "Abrasive (Bound)",
+       "per_unit": 1.00855647208237,
+       "fixed_price": 400.0,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "material_key": 610740015,
+   "name": "Magic Crystal",
+   "options": [
+    {
+     "route_no": 1,
+     "method": "craft",
+     "recipe_id": 215016009,
+     "leaves": [
+      {
+       "item_key": 610530014,
+       "name": "Spiritstone",
+       "per_unit": 2.01711294416474,
+       "fixed_price": null,
+       "via_key": null,
+       "via_name": null
+      },
+      {
+       "item_key": 630543005,
+       "name": "Catalyst (Bound)",
+       "per_unit": 1.00855647208237,
+       "fixed_price": 400.0,
+       "via_key": null,
+       "via_name": null
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

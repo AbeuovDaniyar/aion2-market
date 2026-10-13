@@ -1,0 +1,473 @@
+{
+ "server_id": 11304,
+ "items": 574,
+ "named_items": 574,
+ "total_listings": 9083,
+ "window": "24h",
+ "min_listings": 1,
+ "window_covered_seconds": 82800,
+ "freshness": {
+  "latest_snapshot_at": "2026-10-13T02:05:21.591000Z",
+  "snapshot_age_seconds": 2344,
+  "latest_stats_fetched_at": "2026-10-13T02:08:28.553354Z",
+  "stats_age_seconds": 2157,
+  "latest_batch_day": "2026-10-12T15:00:00Z",
+  "latest_batch_first_seen_at": "2026-10-12T15:08:28.072233Z",
+  "latest_batch_items": 619
+ },
+ "coverage": {
+  "first_snapshot_at": "2026-10-04T10:24:59.619000Z",
+  "snapshots_24h": 24,
+  "stats_observations_24h": 677
+ },
+ "movers": {
+  "price_up": [
+   {
+    "item_key": 115040011,
+    "name": "Bloodthirsty Guard",
+    "price": 15999632.0,
+    "price_then": 5000.0,
+    "change_pct": 319892.64,
+    "listings": 1,
+    "listings_then": 1,
+    "listings_change": 0,
+    "basis_seconds": 36000
+   },
+   {
+    "item_key": 115040038,
+    "name": "Order Guard",
+    "price": 10000001.0,
+    "price_then": 39999.0,
+    "change_pct": 24900.62751568789,
+    "listings": 1,
+    "listings_then": 9,
+    "listings_change": -8,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 110140038,
+    "name": "Order Greatsword",
+    "price": 3000012.0,
+    "price_then": 35551.0,
+    "change_pct": 8338.614947540154,
+    "listings": 2,
+    "listings_then": 9,
+    "listings_change": -7,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 210740011,
+    "name": "Bloodthirsty Cloak",
+    "price": 799975.0,
+    "price_then": 16000.0,
+    "change_pct": 4899.84375,
+    "listings": 7,
+    "listings_then": 9,
+    "listings_change": -2,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 110450005,
+    "name": "Comet Bow",
+    "price": 101111.0,
+    "price_then": 3999.0,
+    "change_pct": 2428.407101775444,
+    "listings": 17,
+    "listings_then": 9,
+    "listings_change": 8,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 110760023,
+    "name": "Orichalcum Mace",
+    "price": 24999.0,
+    "price_then": 1000.0,
+    "change_pct": 2399.9,
+    "listings": 91,
+    "listings_then": 1,
+    "listings_change": 90,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 110850004,
+    "name": "Ethereal Staff",
+    "price": 77772.0,
+    "price_then": 3500.0,
+    "change_pct": 2122.057142857143,
+    "listings": 3,
+    "listings_then": 2,
+    "listings_change": 1,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 110760018,
+    "name": "Riverside Mace",
+    "price": 50000.0,
+    "price_then": 3000.0,
+    "change_pct": 1566.6666666666667,
+    "listings": 18,
+    "listings_then": 3,
+    "listings_change": 15,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 210560025,
+    "name": "Earth Gloves",
+    "price": 24865.0,
+    "price_then": 1500.0,
+    "change_pct": 1557.6666666666667,
+    "listings": 2,
+    "listings_then": 11,
+    "listings_change": -9,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 210560017,
+    "name": "Forgotten Gloves",
+    "price": 14499.0,
+    "price_then": 1000.0,
+    "change_pct": 1349.9,
+    "listings": 21,
+    "listings_then": 1,
+    "listings_change": 20,
+    "basis_seconds": 82800
+   }
+  ],
+  "price_down": [
+   {
+    "item_key": 110460025,
+    "name": "Earth Bow",
+    "price": 99998.0,
+    "price_then": 10000469.0,
+    "change_pct": -99.00006689686253,
+    "listings": 4,
+    "listings_then": 2,
+    "listings_change": 2,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 210450015,
+    "name": "Expert's Orichalcum Pauldrons",
+    "price": 200000.0,
+    "price_then": 10000241.0,
+    "change_pct": -98.00004819883841,
+    "listings": 5,
+    "listings_then": 1,
+    "listings_change": 4,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 110340011,
+    "name": "Bloodthirsty Dagger",
+    "price": 349999.0,
+    "price_then": 4000000.0,
+    "change_pct": -91.250025,
+    "listings": 7,
+    "listings_then": 1,
+    "listings_change": 6,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 210340067,
+    "name": "Taulo Helm",
+    "price": 800000.0,
+    "price_then": 9000000.0,
+    "change_pct": -91.11111111111111,
+    "listings": 1,
+    "listings_then": 1,
+    "listings_change": 0,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 110130006,
+    "name": "Fantasy Greatsword",
+    "price": 950000.0,
+    "price_then": 9999999.0,
+    "change_pct": -90.4999990499999,
+    "listings": 3,
+    "listings_then": 2,
+    "listings_change": 1,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 210340011,
+    "name": "Bloodthirsty Helm",
+    "price": 59999.0,
+    "price_then": 518888.0,
+    "change_pct": -88.43700374647322,
+    "listings": 12,
+    "listings_then": 3,
+    "listings_change": 9,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 210640055,
+    "name": "Garshim Boots",
+    "price": 600000.0,
+    "price_then": 3999999.0,
+    "change_pct": -84.99999624999906,
+    "listings": 1,
+    "listings_then": 1,
+    "listings_change": 0,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 110860025,
+    "name": "Earth Staff",
+    "price": 15000.0,
+    "price_then": 99999.0,
+    "change_pct": -84.99984999849998,
+    "listings": 12,
+    "listings_then": 9,
+    "listings_change": 3,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 610650013,
+    "name": "Fine Yggdrasil Log",
+    "price": 3998.0,
+    "price_then": 22222.0,
+    "change_pct": -82.00882008820088,
+    "listings": 64,
+    "listings_then": 65,
+    "listings_change": -1,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 610660029,
+    "name": "Fine Diamond Gemstone",
+    "price": 1500.0,
+    "price_then": 8000.0,
+    "change_pct": -81.25,
+    "listings": 46,
+    "listings_then": 17,
+    "listings_change": 29,
+    "basis_seconds": 82800
+   }
+  ],
+  "listings_up": [
+   {
+    "item_key": 110760023,
+    "name": "Orichalcum Mace",
+    "price": 24999.0,
+    "price_then": 1000.0,
+    "change_pct": 2399.9,
+    "listings": 91,
+    "listings_then": 1,
+    "listings_change": 90,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 610511013,
+    "name": "Wrathful Mind",
+    "price": 2666666.0,
+    "price_then": 2199999.0,
+    "change_pct": 21.21214600552091,
+    "listings": 147,
+    "listings_then": 61,
+    "listings_change": 86,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 110360023,
+    "name": "Orichalcum Dagger",
+    "price": 22500.0,
+    "price_then": 15000.0,
+    "change_pct": 50.0,
+    "listings": 77,
+    "listings_then": 15,
+    "listings_change": 62,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 610511015,
+    "name": "Wrathful Ego",
+    "price": 1495000.0,
+    "price_then": 1855555.0,
+    "change_pct": -19.43111360212982,
+    "listings": 122,
+    "listings_then": 61,
+    "listings_change": 61,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 110160023,
+    "name": "Orichalcum Greatsword",
+    "price": 24997.0,
+    "price_then": 30000.0,
+    "change_pct": -16.676666666666666,
+    "listings": 96,
+    "listings_then": 36,
+    "listings_change": 60,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 610610016,
+    "name": "Radiant Odyle",
+    "price": 298588.0,
+    "price_then": 288888.0,
+    "change_pct": 3.3577026390850433,
+    "listings": 182,
+    "listings_then": 135,
+    "listings_change": 47,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 310350010,
+    "name": "Splendent Sapphire Ring",
+    "price": 31988.0,
+    "price_then": 43000.0,
+    "change_pct": -25.609302325581396,
+    "listings": 97,
+    "listings_then": 55,
+    "listings_change": 42,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 310360017,
+    "name": "Sapphire Ring",
+    "price": 4500.0,
+    "price_then": 11700.0,
+    "change_pct": -61.53846153846154,
+    "listings": 66,
+    "listings_then": 26,
+    "listings_change": 40,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 600590001,
+    "name": "Balaur's Essence",
+    "price": 22222.0,
+    "price_then": 39000.0,
+    "change_pct": -43.02051282051282,
+    "listings": 62,
+    "listings_then": 22,
+    "listings_change": 40,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 610530001,
+    "name": "Refining Stone",
+    "price": 1700.0,
+    "price_then": 2990.0,
+    "change_pct": -43.1438127090301,
+    "listings": 94,
+    "listings_then": 57,
+    "listings_change": 37,
+    "basis_seconds": 82800
+   }
+  ],
+  "listings_down": [
+   {
+    "item_key": 610511014,
+    "name": "Wrathful Will",
+    "price": 349998.0,
+    "price_then": 328000.0,
+    "change_pct": 6.706707317073171,
+    "listings": 62,
+    "listings_then": 173,
+    "listings_change": -111,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 610610013,
+    "name": "Odyle",
+    "price": 1185.0,
+    "price_then": 1222.0,
+    "change_pct": -3.027823240589198,
+    "listings": 194,
+    "listings_then": 288,
+    "listings_change": -94,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 610620016,
+    "name": "Radiant Orichalcum Ore",
+    "price": 89998.0,
+    "price_then": 47990.0,
+    "change_pct": 87.53490310481351,
+    "listings": 24,
+    "listings_then": 97,
+    "listings_change": -73,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 610531002,
+    "name": "Fresh Fruit",
+    "price": 3300.0,
+    "price_then": 2997.0,
+    "change_pct": 10.11011011011011,
+    "listings": 12,
+    "listings_then": 66,
+    "listings_change": -54,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 610512002,
+    "name": "Soft Balaur Meat",
+    "price": 9999.0,
+    "price_then": 11000.0,
+    "change_pct": -9.1,
+    "listings": 121,
+    "listings_then": 168,
+    "listings_change": -47,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 610650015,
+    "name": "Pure Yggdrasil Log",
+    "price": 71076.0,
+    "price_then": 88888.0,
+    "change_pct": -20.03870038700387,
+    "listings": 32,
+    "listings_then": 77,
+    "listings_change": -45,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 610530008,
+    "name": "Artisan's Refining Stone",
+    "price": 520000.0,
+    "price_then": 500000.0,
+    "change_pct": 4.0,
+    "listings": 60,
+    "listings_then": 100,
+    "listings_change": -40,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 610680043,
+    "name": "Coriolus",
+    "price": 285.0,
+    "price_then": 100.0,
+    "change_pct": 185.0,
+    "listings": 22,
+    "listings_then": 62,
+    "listings_change": -40,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 110750015,
+    "name": "Expert's Orichalcum Mace",
+    "price": 50000.0,
+    "price_then": 44000.0,
+    "change_pct": 13.636363636363637,
+    "listings": 7,
+    "listings_then": 45,
+    "listings_change": -38,
+    "basis_seconds": 82800
+   },
+   {
+    "item_key": 110150015,
+    "name": "Expert's Orichalcum Greatsword",
+    "price": 129999.0,
+    "price_then": 29999.0,
+    "change_pct": 333.34444481482717,
+    "listings": 22,
+    "listings_then": 59,
+    "listings_change": -37,
+    "basis_seconds": 82800
+   }
+  ]
+ }
+}

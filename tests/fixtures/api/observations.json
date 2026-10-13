@@ -1,0 +1,15 @@
+{
+ "item_key": 610610013,
+ "range_start": "2026-10-12T02:44:35.888552Z",
+ "range_end": "2026-10-13T02:44:35.888552Z",
+ "observations": [
+  {
+   "fetched_at": "2026-10-12T15:12:04.706883Z",
+   "registered": "2026-10-12T15:00:00Z",
+   "units_sold": 1960380,
+   "avg_price": 1999.0,
+   "min_price": 100.0,
+   "max_price": 9000.0
+  }
+ ]
+}

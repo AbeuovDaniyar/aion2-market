@@ -1,0 +1,107 @@
+{
+ "window_hours": 72,
+ "last_ok_at": "2026-10-13T02:08:28.561355Z",
+ "last_ok_age_seconds": 2154,
+ "last_run": {
+  "started_at": "2026-10-13T02:08:24.817999Z",
+  "finished_at": "2026-10-13T02:08:28.561355Z",
+  "job": "stats",
+  "status": "ok",
+  "kind": "ok",
+  "requests": 2,
+  "responses": 2,
+  "detail": "day=2026-10-13 eligible=574 fetched=2 archived=2 no_sales=1 unparseable=0 rejected=0 stale=0 no_batch_day=0"
+ },
+ "failed_runs_since_ok": 0,
+ "failing_since": null,
+ "runs": 162,
+ "ok_runs": 159,
+ "streaks": [
+  {
+   "from_at": "2026-10-12T17:05:21.003948Z",
+   "to_at": "2026-10-13T02:08:24.817999Z",
+   "runs": 25,
+   "jobs": [
+    "servers",
+    "snapshot",
+    "stats"
+   ],
+   "status": "ok",
+   "kind": "ok",
+   "detail": "items=566"
+  },
+  {
+   "from_at": "2026-10-12T16:08:26.925667Z",
+   "to_at": "2026-10-12T16:08:26.925667Z",
+   "runs": 1,
+   "jobs": [
+    "stats"
+   ],
+   "status": "skipped",
+   "kind": "other",
+   "detail": "the statistics of 2026-10-13 (KST) are not published yet (the server is at 2026-10-12)"
+  },
+  {
+   "from_at": "2026-10-11T17:05:21.000856Z",
+   "to_at": "2026-10-12T16:05:21.283686Z",
+   "runs": 57,
+   "jobs": [
+    "servers",
+    "snapshot",
+    "stats"
+   ],
+   "status": "ok",
+   "kind": "ok",
+   "detail": "items=552"
+  },
+  {
+   "from_at": "2026-10-11T16:08:27.590520Z",
+   "to_at": "2026-10-11T16:08:27.590520Z",
+   "runs": 1,
+   "jobs": [
+    "stats"
+   ],
+   "status": "skipped",
+   "kind": "other",
+   "detail": "the statistics of 2026-10-12 (KST) are not published yet (the server is at 2026-10-05)"
+  },
+  {
+   "from_at": "2026-10-10T17:34:09.030731Z",
+   "to_at": "2026-10-11T16:05:21.820842Z",
+   "runs": 54,
+   "jobs": [
+    "servers",
+    "snapshot",
+    "stats"
+   ],
+   "status": "ok",
+   "kind": "ok",
+   "detail": "servers=106"
+  },
+  {
+   "from_at": "2026-10-10T16:37:14.237480Z",
+   "to_at": "2026-10-10T16:37:14.237480Z",
+   "runs": 1,
+   "jobs": [
+    "stats"
+   ],
+   "status": "skipped",
+   "kind": "other",
+   "detail": "the statistics of 2026-10-11 (KST) are not published yet (the server is at 2026-10-10)"
+  },
+  {
+   "from_at": "2026-10-10T03:34:09.066097Z",
+   "to_at": "2026-10-10T16:34:09.058941Z",
+   "runs": 23,
+   "jobs": [
+    "servers",
+    "snapshot",
+    "stats"
+   ],
+   "status": "ok",
+   "kind": "ok",
+   "detail": "servers=106"
+  }
+ ],
+ "truncated": false
+}

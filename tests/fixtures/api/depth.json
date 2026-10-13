@@ -1,0 +1,141 @@
+{
+ "item_key": 610610013,
+ "units": 10,
+ "range_start": "2026-10-06T02:44:31.760894Z",
+ "range_end": "2026-10-13T02:44:31.760894Z",
+ "bucket": "1h",
+ "auto": true,
+ "points": [
+  {
+   "ts": "2026-10-06T02:52:06.266000Z",
+   "status": "ok",
+   "cost": 49000.0,
+   "cost_stacks": 102900.0,
+   "units_stacks": 21,
+   "unit_avg": 4900.0,
+   "best": 4900.0,
+   "listings": 100,
+   "units_available": 7341,
+   "complete": false
+  },
+  {
+   "ts": "2026-10-06T03:52:03.154000Z",
+   "status": "ok",
+   "cost": 46000.0,
+   "cost_stacks": 1329400.0,
+   "units_stacks": 289,
+   "unit_avg": 4600.0,
+   "best": 4600.0,
+   "listings": 100,
+   "units_available": 9776,
+   "complete": false
+  },
+  {
+   "ts": "2026-10-06T04:51:57.255000Z",
+   "status": "ok",
+   "cost": 17870.0,
+   "cost_stacks": 21444.0,
+   "units_stacks": 12,
+   "unit_avg": 1787.0,
+   "best": 1787.0,
+   "listings": 100,
+   "units_available": 10782,
+   "complete": false
+  },
+  {
+   "ts": "2026-10-06T05:51:56.996000Z",
+   "status": "ok",
+   "cost": 39900.0,
+   "cost_stacks": 798000.0,
+   "units_stacks": 200,
+   "unit_avg": 3990.0,
+   "best": 3990.0,
+   "listings": 100,
+   "units_available": 10652,
+   "complete": false
+  },
+  {
+   "ts": "2026-10-06T06:52:02.027000Z",
+   "status": "ok",
+   "cost": 36000.0,
+   "cost_stacks": 6156000.0,
+   "units_stacks": 1710,
+   "unit_avg": 3600.0,
+   "best": 3600.0,
+   "listings": 100,
+   "units_available": 12075,
+   "complete": false
+  },
+  {
+   "ts": "2026-10-06T07:52:01.463000Z",
+   "status": "ok",
+   "cost": 17850.0,
+   "cost_stacks": 17850.0,
+   "units_stacks": 10,
+   "unit_avg": 1785.0,
+   "best": 1785.0,
+   "listings": 100,
+   "units_available": 13283,
+   "complete": false
+  },
+  {
+   "ts": "2026-10-06T08:52:02.109000Z",
+   "status": "ok",
+   "cost": 41000.0,
+   "cost_stacks": 7593200.0,
+   "units_stacks": 1852,
+   "unit_avg": 4100.0,
+   "best": 4100.0,
+   "listings": 100,
+   "units_available": 11198,
+   "complete": false
+  },
+  {
+   "ts": "2026-10-06T09:52:04.059000Z",
+   "status": "ok",
+   "cost": 32000.0,
+   "cost_stacks": 89600.0,
+   "units_stacks": 28,
+   "unit_avg": 3200.0,
+   "best": 3200.0,
+   "listings": 100,
+   "units_available": 13196,
+   "complete": false
+  },
+  {
+   "ts": "2026-10-06T10:52:02.784000Z",
+   "status": "ok",
+   "cost": 32000.0,
+   "cost_stacks": 419200.0,
+   "units_stacks": 131,
+   "unit_avg": 3200.0,
+   "best": 3200.0,
+   "listings": 87,
+   "units_available": 10271,
+   "complete": true
+  },
+  {
+   "ts": "2026-10-06T11:52:00.787000Z",
+   "status": "ok",
+   "cost": 40880.0,
+   "cost_stacks": 2510032.0,
+   "units_stacks": 614,
+   "unit_avg": 4088.0,
+   "best": 4088.0,
+   "listings": 42,
+   "units_available": 7320,
+   "complete": true
+  }
+ ],
+ "summary": {
+  "points": 10,
+  "ok": 10,
+  "insufficient": 0,
+  "unknown": 0,
+  "first": 49000.0,
+  "last": 40880.0,
+  "low": 17850.0,
+  "high": 49000.0,
+  "change_pct": -16.57142857142857
+ }
+}

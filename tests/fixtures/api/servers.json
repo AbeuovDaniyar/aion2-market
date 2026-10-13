@@ -1,0 +1,959 @@
+{
+ "default": 11304,
+ "servers": [
+  {
+   "server_id": 11101,
+   "name": "Siel",
+   "game_server_key": 1101,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12101,
+   "name": "Israphel",
+   "game_server_key": 2101,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11102,
+   "name": "Nezekan",
+   "game_server_key": 1102,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12102,
+   "name": "Zikel",
+   "game_server_key": 2102,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11103,
+   "name": "Vaizel",
+   "game_server_key": 1103,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12103,
+   "name": "Triniel",
+   "game_server_key": 2103,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11104,
+   "name": "Kaisinel",
+   "game_server_key": 1104,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12104,
+   "name": "Lumiel",
+   "game_server_key": 2104,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11105,
+   "name": "Yustiel",
+   "game_server_key": 1105,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12105,
+   "name": "Marchutan",
+   "game_server_key": 2105,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11106,
+   "name": "Ariel",
+   "game_server_key": 1106,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12106,
+   "name": "Azphel",
+   "game_server_key": 2106,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11107,
+   "name": "Fregion",
+   "game_server_key": 1107,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12107,
+   "name": "Ereshkigal",
+   "game_server_key": 2107,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11108,
+   "name": "Meslamtaeda",
+   "game_server_key": 1108,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12108,
+   "name": "Beritra",
+   "game_server_key": 2108,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11109,
+   "name": "Hithanya",
+   "game_server_key": 1109,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12109,
+   "name": "Nemon",
+   "game_server_key": 2109,
+   "region": "NAE",
+   "region_name": "North America East",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11201,
+   "name": "Siel",
+   "game_server_key": 1201,
+   "region": "NAW",
+   "region_name": "North America West",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12201,
+   "name": "Israphel",
+   "game_server_key": 2201,
+   "region": "NAW",
+   "region_name": "North America West",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11202,
+   "name": "Nezekan",
+   "game_server_key": 1202,
+   "region": "NAW",
+   "region_name": "North America West",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12202,
+   "name": "Zikel",
+   "game_server_key": 2202,
+   "region": "NAW",
+   "region_name": "North America West",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11203,
+   "name": "Vaizel",
+   "game_server_key": 1203,
+   "region": "NAW",
+   "region_name": "North America West",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12203,
+   "name": "Triniel",
+   "game_server_key": 2203,
+   "region": "NAW",
+   "region_name": "North America West",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11204,
+   "name": "Kaisinel",
+   "game_server_key": 1204,
+   "region": "NAW",
+   "region_name": "North America West",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12204,
+   "name": "Lumiel",
+   "game_server_key": 2204,
+   "region": "NAW",
+   "region_name": "North America West",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11205,
+   "name": "Yustiel",
+   "game_server_key": 1205,
+   "region": "NAW",
+   "region_name": "North America West",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12205,
+   "name": "Marchutan",
+   "game_server_key": 2205,
+   "region": "NAW",
+   "region_name": "North America West",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11301,
+   "name": "Siel",
+   "game_server_key": 1301,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12301,
+   "name": "Israphel",
+   "game_server_key": 2301,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11302,
+   "name": "Nezekan",
+   "game_server_key": 1302,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12302,
+   "name": "Zikel",
+   "game_server_key": 2302,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11303,
+   "name": "Vaizel",
+   "game_server_key": 1303,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12303,
+   "name": "Triniel",
+   "game_server_key": 2303,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11304,
+   "name": "Kaisinel",
+   "game_server_key": 1304,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12304,
+   "name": "Lumiel",
+   "game_server_key": 2304,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11305,
+   "name": "Yustiel",
+   "game_server_key": 1305,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12305,
+   "name": "Marchutan",
+   "game_server_key": 2305,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11306,
+   "name": "Ariel",
+   "game_server_key": 1306,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12306,
+   "name": "Azphel",
+   "game_server_key": 2306,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11307,
+   "name": "Fregion",
+   "game_server_key": 1307,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12307,
+   "name": "Ereshkigal",
+   "game_server_key": 2307,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11308,
+   "name": "Meslamtaeda",
+   "game_server_key": 1308,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12308,
+   "name": "Beritra",
+   "game_server_key": 2308,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11309,
+   "name": "Hithanya",
+   "game_server_key": 1309,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12309,
+   "name": "Nemon",
+   "game_server_key": 2309,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11310,
+   "name": "Nania",
+   "game_server_key": 1310,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12310,
+   "name": "Hadala",
+   "game_server_key": 2310,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11311,
+   "name": "Tahavatha",
+   "game_server_key": 1311,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12311,
+   "name": "Ludra",
+   "game_server_key": 2311,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11312,
+   "name": "Luteros",
+   "game_server_key": 1312,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12312,
+   "name": "Ulgorn",
+   "game_server_key": 2312,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11313,
+   "name": "Phernos",
+   "game_server_key": 1313,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12313,
+   "name": "Munin",
+   "game_server_key": 2313,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11314,
+   "name": "Daminu",
+   "game_server_key": 1314,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12314,
+   "name": "Odar",
+   "game_server_key": 2314,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11315,
+   "name": "Kasaka",
+   "game_server_key": 1315,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12315,
+   "name": "Zemurru",
+   "game_server_key": 2315,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11316,
+   "name": "Bakarma",
+   "game_server_key": 1316,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12316,
+   "name": "Kromede",
+   "game_server_key": 2316,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11317,
+   "name": "Tsenka",
+   "game_server_key": 1317,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12317,
+   "name": "Quai",
+   "game_server_key": 2317,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11318,
+   "name": "Kochi",
+   "game_server_key": 1318,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12318,
+   "name": "Baba",
+   "game_server_key": 2318,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11319,
+   "name": "Ishtar",
+   "game_server_key": 1319,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12319,
+   "name": "Fafnir",
+   "game_server_key": 2319,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11320,
+   "name": "Tiamat",
+   "game_server_key": 1320,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12320,
+   "name": "Indnath",
+   "game_server_key": 2320,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11321,
+   "name": "Gauss",
+   "game_server_key": 1321,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12321,
+   "name": "Agnita",
+   "game_server_key": 2321,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11322,
+   "name": "Lamuatan",
+   "game_server_key": 1322,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12322,
+   "name": "Atiel",
+   "game_server_key": 2322,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11323,
+   "name": "Nathara",
+   "game_server_key": 1323,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12323,
+   "name": "Tassin",
+   "game_server_key": 2323,
+   "region": "EU",
+   "region_name": "Europe",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11401,
+   "name": "Siel",
+   "game_server_key": 1401,
+   "region": "LA",
+   "region_name": "South America",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12401,
+   "name": "Israphel",
+   "game_server_key": 2401,
+   "region": "LA",
+   "region_name": "South America",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11402,
+   "name": "Nezekan",
+   "game_server_key": 1402,
+   "region": "LA",
+   "region_name": "South America",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12402,
+   "name": "Zikel",
+   "game_server_key": 2402,
+   "region": "LA",
+   "region_name": "South America",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11403,
+   "name": "Vaizel",
+   "game_server_key": 1403,
+   "region": "LA",
+   "region_name": "South America",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12403,
+   "name": "Triniel",
+   "game_server_key": 2403,
+   "region": "LA",
+   "region_name": "South America",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11404,
+   "name": "Kaisinel",
+   "game_server_key": 1404,
+   "region": "LA",
+   "region_name": "South America",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12404,
+   "name": "Lumiel",
+   "game_server_key": 2404,
+   "region": "LA",
+   "region_name": "South America",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11405,
+   "name": "Yustiel",
+   "game_server_key": 1405,
+   "region": "LA",
+   "region_name": "South America",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12405,
+   "name": "Marchutan",
+   "game_server_key": 2405,
+   "region": "LA",
+   "region_name": "South America",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11406,
+   "name": "Ariel",
+   "game_server_key": 1406,
+   "region": "LA",
+   "region_name": "South America",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12406,
+   "name": "Azphel",
+   "game_server_key": 2406,
+   "region": "LA",
+   "region_name": "South America",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11501,
+   "name": "Siel",
+   "game_server_key": 1501,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12501,
+   "name": "Israphel",
+   "game_server_key": 2501,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11502,
+   "name": "Nezekan",
+   "game_server_key": 1502,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12502,
+   "name": "Zikel",
+   "game_server_key": 2502,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11503,
+   "name": "Vaizel",
+   "game_server_key": 1503,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12503,
+   "name": "Triniel",
+   "game_server_key": 2503,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11504,
+   "name": "Kaisinel",
+   "game_server_key": 1504,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12504,
+   "name": "Lumiel",
+   "game_server_key": 2504,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11505,
+   "name": "Yustiel",
+   "game_server_key": 1505,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12505,
+   "name": "Marchutan",
+   "game_server_key": 2505,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11506,
+   "name": "Ariel",
+   "game_server_key": 1506,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12506,
+   "name": "Azphel",
+   "game_server_key": 2506,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11507,
+   "name": "Fregion",
+   "game_server_key": 1507,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12507,
+   "name": "Ereshkigal",
+   "game_server_key": 2507,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11508,
+   "name": "Meslamtaeda",
+   "game_server_key": 1508,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12508,
+   "name": "Beritra",
+   "game_server_key": 2508,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11509,
+   "name": "Hithanya",
+   "game_server_key": 1509,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12509,
+   "name": "Nemon",
+   "game_server_key": 2509,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Asmodian",
+   "has_data": true
+  },
+  {
+   "server_id": 11510,
+   "name": "Nania",
+   "game_server_key": 1510,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Elyos",
+   "has_data": true
+  },
+  {
+   "server_id": 12510,
+   "name": "Hadala",
+   "game_server_key": 2510,
+   "region": "AS",
+   "region_name": "Asia",
+   "faction": "Asmodian",
+   "has_data": true
+  }
+ ]
+}
