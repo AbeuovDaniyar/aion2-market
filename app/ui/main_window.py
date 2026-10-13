@@ -124,13 +124,13 @@ class StatusBar(QFrame):
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, db_path: str | Path, source_factory, parent=None):
+    def __init__(self, db_path: str | Path, source_factory, parent=None, icon_fetcher_factory=None):
         super().__init__(parent)
         self.setWindowTitle("AION 2 Market Assistant")
         self.resize(1500, 900)
         self.db = Database(db_path)
         self.state = AppState(self.db, self)
-        self.worker = RefreshWorker(db_path, source_factory, self)
+        self.worker = RefreshWorker(db_path, source_factory, self, icon_fetcher_factory)
 
         self.status = StatusBar(self.state, self.worker)
         self.banner = QLabel()
@@ -197,6 +197,7 @@ class MainWindow(QMainWindow):
         self.worker.started_refresh.connect(lambda: self.status.set_busy(True))
         self.worker.refreshed.connect(self._refreshed)
         self.worker.item_loaded.connect(self.items.on_item_loaded)
+        self.worker.icons_loaded.connect(self._icons_loaded)
 
         self.state.reload()  # show stored data before the first refresh returns
         self.worker.start()
@@ -208,6 +209,13 @@ class MainWindow(QMainWindow):
     def _refreshed(self, result: RefreshResult) -> None:
         self.status.set_busy(False)
         self.state.on_refreshed(result)
+
+    def _icons_loaded(self, count: int) -> None:
+        self.state.load_icons()
+        for table in self.findChildren(tables.Table):
+            table.viewport().update()  # repaint with the new icons, keeping sort and selection
+        if self.items._key is not None:
+            self.items._draw()
 
     def _settings_saved(self) -> None:
         self.state.reload()

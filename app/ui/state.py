@@ -8,12 +8,13 @@ from PySide6.QtCore import QObject, Signal
 
 from app.analysis import alerts, flips, service
 from app.analysis.fees import Fees
-from app.db.repo import Database, utcnow
+from app.db.repo import Database, icons_dir, utcnow
 from app.external import models as m
 from app.external.aion2exchange import read_cached
 from app.external.scheduler import RefreshResult
 from app.external.source import Freshness
-from app.ui.icons import item_icon
+from app.external.icons import icon_files
+from app.ui.icons import icon_for, set_icon_files
 
 
 @dataclass(frozen=True)
@@ -61,6 +62,7 @@ class AppState(QObject):
         self.reload()
 
     def reload(self) -> None:
+        self.load_icons()
         if self.server_id is None:
             chosen = self.db.get_setting("server_id")
             mine = [s["id"] for s in self.db.servers() if s["is_mine"]]
@@ -96,7 +98,11 @@ class AppState(QObject):
     def icon(self, item_key: int | None):
         """The category icon of an item on this server, or None if it is not in the catalog."""
         view = self.by_key.get(item_key)
-        return item_icon(view.section, view.category_name) if view else None
+        return icon_for(view.item_key, view.section, view.category_name) if view else None
+
+    def load_icons(self) -> None:
+        """Pick up icons the worker has downloaded since the last look."""
+        set_icon_files(icons_dir(self.db.path), icon_files(self.db))
 
     @property
     def alerts_paused(self) -> bool:

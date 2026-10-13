@@ -12,6 +12,11 @@ from app.external import models as m
 SCHEMA_PATH = Path(__file__).with_name("schema.sql")
 DEFAULT_DB_PATH = Path(__file__).resolve().parents[2] / "data" / "market.db"
 
+
+def icons_dir(db_path: str | Path) -> Path:
+    """Downloaded item icons live next to the database."""
+    return Path(db_path).parent / "icons"
+
 # Defaults for the design doc's open questions; all editable in Settings.
 DEFAULT_SETTINGS: dict[str, str] = {
     "server_id": "",  # empty = the API's default server
@@ -47,6 +52,7 @@ DEFAULT_SETTINGS: dict[str, str] = {
     "sanity_jump_factor": "5",
     "sanity_drop_factor": "0.2",
     "streak_risk": "0.05",  # the 1-in-20 bad streak
+    "real_item_icons": "1",  # fetch the game's item icons from NCSOFT's item dictionary
     # Alerts
     "alert_min_profit": "50000",  # toast for a flip or craft above this profit
     "dip_pct": "20",  # watched item this far below its 7-day median

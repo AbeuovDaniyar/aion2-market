@@ -85,3 +85,8 @@ CREATE TABLE IF NOT EXISTS farm_drops (
   PRIMARY KEY (run_id, item_key)
 );
 CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, day TEXT, label TEXT, kind TEXT);
+
+-- Real item icons from NCSOFT's item dictionary; file is NULL when none was found.
+CREATE TABLE IF NOT EXISTS item_icons (
+  item_key INTEGER PRIMARY KEY, file TEXT, grade TEXT, checked_at TEXT
+);

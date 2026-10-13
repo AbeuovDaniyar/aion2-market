@@ -571,6 +571,9 @@ SETTINGS = [
         ("demand_reference_servers", "Demand-reference server ids (comma separated)", "text"),
         ("reference_refresh_hours", "Refresh reference servers every (hours)", "float"),
     ]),
+    ("Item icons", [
+        ("real_item_icons", "Fetch the game's item icons from NCSOFT's item dictionary (1 = on, 0 = off)", "float"),
+    ]),
     ("Alerts", [
         ("alert_toasts", "Desktop notifications (1 = on, 0 = off)", "float"),
         ("alert_sound", "Sound with notifications (1 = on, 0 = off)", "float"),

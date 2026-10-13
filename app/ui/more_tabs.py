@@ -30,7 +30,7 @@ from app.analysis import alerts, farming, ledger, service
 from app.analysis.fees import Fees
 from app.db.repo import iso, parse_iso, utcnow
 from app.ui import tables
-from app.ui.icons import item_icon
+from app.ui.icons import grade_of, icon_for
 from app.ui.state import AppState
 from app.ui.tables import Column, Table
 
@@ -50,7 +50,7 @@ def item_box(state: AppState, key: int | None = None) -> QComboBox:
     box = QComboBox(editable=True)
     box.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
     for view in sorted(state.views, key=lambda v: v.name or ""):
-        box.addItem(item_icon(view.section, view.category_name), view.name or str(view.item_key), view.item_key)
+        box.addItem(icon_for(view.item_key, view.section, view.category_name), view.name or str(view.item_key), view.item_key)
     box.completer().setFilterMode(Qt.MatchFlag.MatchContains)
     box.completer().setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
     box.setCurrentIndex(box.findData(key) if key else -1)
@@ -502,7 +502,7 @@ class ToolsTab(QWidget):
             self.sell_item.blockSignals(True)
             self.sell_item.clear()
             for view in sorted(self.state.views, key=lambda v: v.name or ""):
-                self.sell_item.addItem(item_icon(view.section, view.category_name), view.name or str(view.item_key), view.item_key)
+                self.sell_item.addItem(icon_for(view.item_key, view.section, view.category_name), view.name or str(view.item_key), view.item_key)
             self.sell_item.setCurrentIndex(self.sell_item.findData(key) if key else -1)
             self.sell_item.blockSignals(False)
         fees = Fees.from_db(self.state.db)

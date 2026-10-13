@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (
 from app.analysis import farming, pricing, service
 from app.db.repo import parse_iso, utcnow
 from app.ui import tables
-from app.ui.icons import item_icon
+from app.ui.icons import grade_of, icon_for
 from app.ui.state import AppState
 from app.ui.tables import Column, Table
 
@@ -31,8 +31,9 @@ RANGES = {"24 h": 1, "7 days": 7, "30 days": 30, "All": None}
 
 COLUMNS = [
     Column("Item", lambda v: v.name or str(v.item_key),
-           icon=lambda v: item_icon(v.section, v.category_name)),
+           icon=lambda v: icon_for(v.item_key, v.section, v.category_name)),
     Column("Category", lambda v: v.category_name),
+    Column("Grade", lambda v: grade_of(v.item_key), tip="From NCSOFT's item dictionary, once the icon is fetched"),
     Column("Cheapest", lambda v: v.cheapest, tables.kina),
     Column("Est. sale", lambda v: v.estimate.price, tables.kina,
            "Realistic sale price before fees: the lowest of the sale average, the depth price "
@@ -234,7 +235,7 @@ class ItemsTab(QWidget):
         db, server = self.state.db, self.state.server_id
         now = utcnow()
         self.title.setText(view.name or str(view.item_key))
-        self.title_icon.setPixmap(item_icon(view.section, view.category_name).pixmap(32, 32))
+        self.title_icon.setPixmap(icon_for(view.item_key, view.section, view.category_name).pixmap(32, 32))
         self.watch.setChecked(view.item_key in db.watched_keys())
         row = db.conn.execute("SELECT notes FROM items WHERE item_key = ?", (view.item_key,)).fetchone()
         if not self.notes.hasFocus():

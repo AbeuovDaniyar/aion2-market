@@ -21,3 +21,6 @@ dist/
 .vscode/
 .idea/
 Thumbs.db
+
+# Downloaded game icons (NCSOFT artwork; local use only)
+data/icons/

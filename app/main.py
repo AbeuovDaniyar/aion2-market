@@ -11,8 +11,9 @@ from __future__ import annotations
 import argparse
 import sys
 
-from app.db.repo import DEFAULT_DB_PATH, Database
+from app.db.repo import DEFAULT_DB_PATH, Database, icons_dir
 from app.external.aion2exchange import Aion2ExchangeSource
+from app.external.icons import IconFetcher
 from app.external.scheduler import RefreshResult, refresh_once
 
 
@@ -68,7 +69,11 @@ def main(argv: list[str] | None = None) -> int:
     app = QApplication(sys.argv[:1])
     app.setApplicationName("AION 2 Market Assistant")
     style_charts(app)
-    window = MainWindow(args.db, Aion2ExchangeSource)
+    window = MainWindow(
+        args.db,
+        Aion2ExchangeSource,
+        icon_fetcher_factory=lambda db: IconFetcher(db, icons_dir(args.db)),
+    )
     window.show()
     return app.exec()
 

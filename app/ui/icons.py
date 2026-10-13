@@ -1,13 +1,10 @@
-"""Item icons by category, drawn locally.
-
-The API has no item artwork and the site's pages are off limits, so an item gets
-its category's symbol on a tile coloured by section: enough to tell a bow from a
-potion at a glance. They are not the game's own icons.
-"""
+"""Item icons: the game's own icon when it has been downloaded (app.external.icons),
+otherwise the category's symbol on a tile coloured by section, drawn locally."""
 
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 
 from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QColor, QFont, QIcon, QPainter, QPixmap
@@ -93,3 +90,36 @@ def item_icon(section: str | None, category: str | None) -> QIcon:
     painter.drawText(QRectF(0, 0, SIZE, SIZE), Qt.AlignmentFlag.AlignCenter, symbol_for(section, category))
     painter.end()
     return QIcon(pixmap)
+
+
+_files: dict[int, tuple[str, str | None]] = {}
+_dir: Path | None = None
+
+
+def set_icon_files(directory: Path, files: dict[int, tuple[str, str | None]]) -> None:
+    """Tell the UI which real icons are on disk: item_key -> (file name, grade)."""
+    global _dir
+    _dir = directory
+    _files.clear()
+    _files.update(files)
+
+
+@lru_cache(maxsize=None)
+def _file_icon(path: str) -> QIcon | None:
+    pixmap = QPixmap(path)
+    return None if pixmap.isNull() else QIcon(pixmap)
+
+
+def icon_for(item_key: int | None, section: str | None, category: str | None) -> QIcon:
+    """The item's real icon if downloaded, else its category icon."""
+    entry = _files.get(item_key)
+    if entry and _dir is not None:
+        icon = _file_icon(str(_dir / entry[0]))
+        if icon is not None:
+            return icon
+    return item_icon(section, category)
+
+
+def grade_of(item_key: int | None) -> str | None:
+    entry = _files.get(item_key)
+    return entry[1] if entry else None

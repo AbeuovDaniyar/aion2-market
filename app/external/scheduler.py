@@ -143,16 +143,19 @@ class RefreshWorker(QThread):
     refreshed = Signal(object)  # RefreshResult
     started_refresh = Signal()
     item_loaded = Signal(int, object)  # item_key, error message or None
+    icons_loaded = Signal(int)  # how many item icons were just fetched
 
     def __init__(
         self,
         db_path: str | Path,
         source_factory: Callable[[Database], PriceSource],
         parent=None,
+        icon_fetcher_factory: Callable[[Database], object] | None = None,
     ):
         super().__init__(parent)
         self._db_path = db_path
         self._source_factory = source_factory
+        self._icon_fetcher_factory = icon_fetcher_factory
         self._jobs: queue.Queue[tuple] = queue.Queue()
         self.min_manual_gap_s = 60.0
         self.next_refresh_at: datetime | None = None
@@ -171,6 +174,7 @@ class RefreshWorker(QThread):
     def run(self) -> None:
         db = Database(self._db_path)  # SQLite connections stay on their own thread
         source = self._source_factory(db)
+        icons = self._icon_fetcher_factory(db) if self._icon_fetcher_factory else None
         try:
             while True:  # refreshes once at startup, then on schedule or on request
                 self.started_refresh.emit()
@@ -179,11 +183,19 @@ class RefreshWorker(QThread):
                 minutes = max(10.0, db.get_float("refresh_minutes"))  # polite floor
                 self.next_refresh_at = utcnow() + timedelta(minutes=minutes)
                 self.refreshed.emit(result)
+                icons_pending = icons is not None and result.server_id is not None
                 while True:
                     try:
                         remaining = last + minutes * 60 - time.monotonic()
-                        job = self._jobs.get(timeout=max(0.0, remaining))
+                        # While icons are still missing, fetch a few between jobs.
+                        job = self._jobs.get(timeout=0.05 if icons_pending else max(0.0, remaining))
                     except queue.Empty:
+                        if icons_pending and remaining > 0:
+                            fetched = icons.fetch_some(result.server_id, 2)
+                            icons_pending = fetched > 0
+                            if fetched:
+                                self.icons_loaded.emit(fetched)
+                            continue
                         break
                     if job[0] == "stop":
                         return
@@ -194,7 +206,8 @@ class RefreshWorker(QThread):
                     if job[0] == "force" or time.monotonic() - last >= self.min_manual_gap_s:
                         break
         finally:
-            close = getattr(source, "close", None)
-            if close:
-                close()
+            for closable in (source, icons):
+                close = getattr(closable, "close", None)
+                if close:
+                    close()
             db.close()
