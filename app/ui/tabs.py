@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -54,7 +55,7 @@ class OpportunitiesTab(QWidget):
         self.table = Table(
             [
                 Column("Type", lambda o: o.kind),
-                Column("Item", lambda o: o.name),
+                Column("Item", lambda o: o.name, icon=lambda o: state.icon(o.item_key)),
                 Column("Expected profit", lambda o: o.profit, tables.kina,
                        "Within the horizon set in Settings. Blank where no number can be put on it"),
                 Column("Confidence", lambda o: o.confidence),
@@ -174,7 +175,7 @@ class RecipeDialog(QDialog):
         if optional:
             box.addItem("(same item)", None)
         for item_key, name in sorted(self._names.items(), key=lambda kv: kv[1]):
-            box.addItem(name, item_key)
+            box.addItem(self.state.icon(item_key) or QIcon(), name, item_key)
         box.completer().setFilterMode(Qt.MatchFlag.MatchContains)
         box.completer().setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
         index = box.findData(key) if key else (0 if optional else -1)
@@ -236,7 +237,7 @@ class CraftingTab(QWidget):
         self.state = state
         self.api = Table(
             [
-                Column("Item", lambda r: r.name or str(r.target_key)),
+                Column("Item", lambda r: r.name or str(r.target_key), icon=lambda r: state.icon(r.target_key)),
                 Column("Skill", lambda r: r.skill),
                 Column("Expected cost", lambda r: r.api_cost if r.api_cost is not None else r.buy_cost, tables.kina,
                        "Per finished item, over every step's failures and missed COMBOs (API model)"),
@@ -255,7 +256,7 @@ class CraftingTab(QWidget):
         )
         self.mine = Table(
             [
-                Column("Output", lambda r: r.name),
+                Column("Output", lambda r: r.name, icon=lambda r: state.icon(r.output_key)),
                 Column("Success", lambda r: r.success_rate, tables.rate),
                 Column("Break-even rate", lambda r: r.break_even_rate, tables.rate,
                        "The success rate at which this craft earns nothing"),
@@ -360,7 +361,7 @@ class FlipsTab(QWidget):
         self.note.setWordWrap(True)
         self.table = Table(
             [
-                Column("Item", lambda c: c.name or str(c.item_key)),
+                Column("Item", lambda c: c.name or str(c.item_key), icon=lambda c: state.icon(c.item_key)),
                 Column("Buy price", lambda c: c.buy_price, tables.kina),
                 Column("Resale target", lambda c: c.resale_target, tables.kina),
                 Column("Capped by", lambda c: c.basis.replace("_", " ")),

@@ -13,6 +13,7 @@ from app.external import models as m
 from app.external.aion2exchange import read_cached
 from app.external.scheduler import RefreshResult
 from app.external.source import Freshness
+from app.ui.icons import item_icon
 
 
 @dataclass(frozen=True)
@@ -91,6 +92,11 @@ class AppState(QObject):
             self._alerted = {a.id for a in self.alerts}
             if fresh:
                 self.alerts_raised.emit(fresh)
+
+    def icon(self, item_key: int | None):
+        """The category icon of an item on this server, or None if it is not in the catalog."""
+        view = self.by_key.get(item_key)
+        return item_icon(view.section, view.category_name) if view else None
 
     @property
     def alerts_paused(self) -> bool:

@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
 
-from PySide6.QtCore import QAbstractTableModel, QModelIndex, QSortFilterProxyModel, Qt
+from PySide6.QtCore import QAbstractTableModel, QModelIndex, QSize, QSortFilterProxyModel, Qt
 from PySide6.QtGui import QBrush, QPalette
 from PySide6.QtWidgets import QAbstractItemView, QApplication, QHeaderView, QTableView
 
@@ -58,6 +58,7 @@ class Column:
     value: Callable[[Any], Any]
     fmt: Callable[[Any], str] = lambda v: "" if v is None else str(v)
     tip: str = ""
+    icon: Callable[[Any], Any] | None = None  # row -> QIcon, shown before the text
 
 
 class TableModel(QAbstractTableModel):
@@ -94,6 +95,8 @@ class TableModel(QAbstractTableModel):
         column = self.columns[index.column()]
         if role == Qt.ItemDataRole.DisplayRole:
             return column.fmt(column.value(row))
+        if role == Qt.ItemDataRole.DecorationRole:
+            return column.icon(row) if column.icon else None
         if role == Qt.ItemDataRole.UserRole:
             return column.value(row)
         if role == Qt.ItemDataRole.TextAlignmentRole:
@@ -142,6 +145,7 @@ class Table(QTableView):
         self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.setAlternatingRowColors(True)
+        self.setIconSize(QSize(20, 20))
         self.verticalHeader().hide()
         self.verticalHeader().setDefaultSectionSize(24)
         header = self.horizontalHeader()

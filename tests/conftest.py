@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")  # UI tests never open a real window
 from datetime import UTC, datetime
@@ -95,3 +96,20 @@ def break_api(router, response: httpx.Response | Exception) -> None:
             route.mock(side_effect=response)
         else:
             route.mock(return_value=response)
+
+
+_TIMESTAMP = re.compile(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?Z")
+
+
+def shift_to_now(router) -> None:
+    """Re-date every recorded response so it looks freshly fetched. Code that reads the
+    real clock (the window) then sees the recordings as current, whenever the tests run."""
+    delta = datetime.now(UTC) - RECORDED_AT
+
+    def moved(match: re.Match) -> str:
+        stamp = datetime.fromisoformat(match.group().replace("Z", "+00:00")) + delta
+        return stamp.isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+    for pattern, name in ROUTES:
+        text = _TIMESTAMP.sub(moved, (FIXTURES / f"{name}.json").read_text(encoding="utf-8"))
+        router[name].mock(return_value=httpx.Response(200, json=json.loads(text)))

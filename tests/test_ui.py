@@ -12,7 +12,7 @@ from app.analysis import service
 from app.external.aion2exchange import Aion2ExchangeSource
 from app.external.scheduler import refresh_once
 from app.ui.main_window import MainWindow, style_charts
-from tests.conftest import ODYLE, SERVER
+from tests.conftest import ODYLE, SERVER, shift_to_now
 
 
 @pytest.fixture(scope="session")
@@ -32,6 +32,7 @@ def pump(qapp, until, seconds: float = 30) -> None:
 
 @pytest.fixture
 def window(qapp, tmp_path, api):
+    shift_to_now(api)  # the window reads the real clock
     win = MainWindow(
         tmp_path / "market.db",
         lambda db: Aion2ExchangeSource(db, min_interval_s=0, sleep=lambda s: None),

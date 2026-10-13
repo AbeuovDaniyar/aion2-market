@@ -30,6 +30,7 @@ from app.analysis import alerts, farming, ledger, service
 from app.analysis.fees import Fees
 from app.db.repo import iso, parse_iso, utcnow
 from app.ui import tables
+from app.ui.icons import item_icon
 from app.ui.state import AppState
 from app.ui.tables import Column, Table
 
@@ -49,7 +50,7 @@ def item_box(state: AppState, key: int | None = None) -> QComboBox:
     box = QComboBox(editable=True)
     box.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
     for view in sorted(state.views, key=lambda v: v.name or ""):
-        box.addItem(view.name or str(view.item_key), view.item_key)
+        box.addItem(item_icon(view.section, view.category_name), view.name or str(view.item_key), view.item_key)
     box.completer().setFilterMode(Qt.MatchFlag.MatchContains)
     box.completer().setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
     box.setCurrentIndex(box.findData(key) if key else -1)
@@ -80,7 +81,7 @@ class WatchlistTab(QWidget):
         self.merge.clicked.connect(self._toggle_merge)
         self.table = Table(
             [
-                Column("Item", lambda r: r.view.name or str(r.view.item_key)),
+                Column("Item", lambda r: r.view.name or str(r.view.item_key), icon=lambda r: state.icon(r.view.item_key)),
                 Column("Watched", lambda r: "yes" if r.watched else ""),
                 Column("Cheapest", lambda r: r.view.cheapest, tables.kina),
                 Column("Est. sale", lambda r: r.view.estimate.price, tables.kina),
@@ -271,7 +272,7 @@ class TradesTab(QWidget):
         self.table = Table(
             [
                 Column("Date", lambda t: (t["done_at"] or t["listed_at"] or "")[:10]),
-                Column("Item", lambda t: t["name"] or str(t["item_key"])),
+                Column("Item", lambda t: t["name"] or str(t["item_key"]), icon=lambda t: state.icon(t["item_key"])),
                 Column("Side", lambda t: t["side"]),
                 Column("Qty", lambda t: t["qty"], tables.kina),
                 Column("Unit price", lambda t: t["unit_price"], tables.kina),
@@ -501,7 +502,7 @@ class ToolsTab(QWidget):
             self.sell_item.blockSignals(True)
             self.sell_item.clear()
             for view in sorted(self.state.views, key=lambda v: v.name or ""):
-                self.sell_item.addItem(view.name or str(view.item_key), view.item_key)
+                self.sell_item.addItem(item_icon(view.section, view.category_name), view.name or str(view.item_key), view.item_key)
             self.sell_item.setCurrentIndex(self.sell_item.findData(key) if key else -1)
             self.sell_item.blockSignals(False)
         fees = Fees.from_db(self.state.db)

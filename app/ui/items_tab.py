@@ -23,13 +23,15 @@ from PySide6.QtWidgets import (
 from app.analysis import farming, pricing, service
 from app.db.repo import parse_iso, utcnow
 from app.ui import tables
+from app.ui.icons import item_icon
 from app.ui.state import AppState
 from app.ui.tables import Column, Table
 
 RANGES = {"24 h": 1, "7 days": 7, "30 days": 30, "All": None}
 
 COLUMNS = [
-    Column("Item", lambda v: v.name or str(v.item_key)),
+    Column("Item", lambda v: v.name or str(v.item_key),
+           icon=lambda v: item_icon(v.section, v.category_name)),
     Column("Category", lambda v: v.category_name),
     Column("Cheapest", lambda v: v.cheapest, tables.kina),
     Column("Est. sale", lambda v: v.estimate.price, tables.kina,
@@ -82,6 +84,7 @@ class ItemsTab(QWidget):
         # -- detail panel --
         self.title = QLabel("Select an item")
         self.title.setStyleSheet("font-size: 15px; font-weight: 600;")
+        self.title_icon = QLabel()
         self.stats = QLabel()
         self.stats.setWordWrap(True)
         self.reference = QLabel()
@@ -154,7 +157,10 @@ class ItemsTab(QWidget):
 
         right = QWidget()
         detail = QVBoxLayout(right)
-        detail.addWidget(self.title)
+        heading = QHBoxLayout()
+        heading.addWidget(self.title_icon)
+        heading.addWidget(self.title, 1)
+        detail.addLayout(heading)
         detail.addWidget(self.stats)
         detail.addWidget(self.reference)
         detail.addLayout(ranges)
@@ -228,6 +234,7 @@ class ItemsTab(QWidget):
         db, server = self.state.db, self.state.server_id
         now = utcnow()
         self.title.setText(view.name or str(view.item_key))
+        self.title_icon.setPixmap(item_icon(view.section, view.category_name).pixmap(32, 32))
         self.watch.setChecked(view.item_key in db.watched_keys())
         row = db.conn.execute("SELECT notes FROM items WHERE item_key = ?", (view.item_key,)).fetchone()
         if not self.notes.hasFocus():

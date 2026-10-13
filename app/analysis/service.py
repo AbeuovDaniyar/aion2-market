@@ -196,6 +196,7 @@ class RecipeRow:
     """A recipe Danny entered by hand, valued with the single-craft EV formula."""
 
     recipe_id: int
+    output_key: int
     name: str
     success_rate: float | None
     combo_probability: float
@@ -268,7 +269,7 @@ def recipe_rows(db: Database, views: list[ItemView]) -> list[RecipeRow]:
                 if logged.below_expected:
                     flags.append("results_below_expected")
         rows.append(
-            RecipeRow(recipe["id"], name, p_s, p_c, materials, ev, margin, per_hour, even,
+            RecipeRow(recipe["id"], recipe["output_key"], name, p_s, p_c, materials, ev, margin, per_hour, even,
                       budget, saturated, tuple(flags), logged, attempts)
         )
     return sorted(rows, key=lambda r: r.ev if r.ev is not None else float("-inf"), reverse=True)
