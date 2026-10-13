@@ -28,6 +28,7 @@ class RefreshResult:
     sales_updated: int = 0
     served_stale: bool = False  # item data came from cache because the API was down
     error: str | None = None
+    reference_updated: int = 0  # other servers in the region refreshed this round
 
 
 def resolve_server(db: Database, source: PriceSource) -> int:
@@ -54,7 +55,7 @@ def refresh_once(
             return RefreshResult(now(), None, Freshness("down", now(), detail=str(exc)), error=str(exc))
 
     freshness = source.freshness(server_id)
-    items_updated = sales_updated = 0
+    items_updated = sales_updated = reference_updated = 0
     served_stale = False
     error = None
     try:
@@ -65,11 +66,35 @@ def refresh_once(
             items_updated = db.save_item_summaries(server_id, items.data, items.fetched_at)
         if freshness.state != "down":
             sales_updated = _refresh_sales(db, source, server_id, now())
+            reference_updated = _refresh_reference_servers(db, source, server_id, now())
     except SourceError as exc:
         error = str(exc)
 
-    # TODO(milestone 2): recompute the pricing model for the items that changed.
-    return RefreshResult(now(), server_id, freshness, items_updated, sales_updated, served_stale, error)
+    # The pricing model is computed on read (app.analysis.service), so nothing to recompute.
+    return RefreshResult(
+        now(), server_id, freshness, items_updated, sales_updated, served_stale, error,
+        reference_updated,
+    )
+
+
+def _refresh_reference_servers(
+    db: Database, source: PriceSource, server_id: int, now: datetime
+) -> int:
+    """Catalog snapshots of the other servers in the region: one call each, every few hours."""
+    max_age = timedelta(hours=db.get_float("reference_refresh_hours"))
+    updated = 0
+    for other in db.reference_server_ids(server_id):
+        marker = f"reference_refreshed:{other}"
+        last = parse_iso(db.get_setting(marker))
+        if last and now - last < max_age:
+            continue
+        items = source.all_items(other)
+        if items.stale:
+            continue
+        db.save_item_summaries(other, items.data, items.fetched_at)
+        db.set_setting(marker, now.isoformat())
+        updated += 1
+    return updated
 
 
 def _refresh_sales(db: Database, source: PriceSource, server_id: int, now: datetime) -> int:

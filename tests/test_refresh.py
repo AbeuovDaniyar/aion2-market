@@ -28,7 +28,7 @@ def test_refresh_fills_the_database(db, source, clock):
 def test_server_setting_overrides_api_default(db, source, clock, api):
     db.set_setting("server_id", 12304)
     assert refresh_once(db, source, clock).server_id == 12304
-    assert api["items"].calls.last.request.url.params["server"] == "12304"
+    assert api["items"].calls[0].request.url.params["server"] == "12304"
 
 
 def test_refresh_is_idempotent_and_keeps_user_fields(db, source, clock):
@@ -37,7 +37,8 @@ def test_refresh_is_idempotent_and_keeps_user_fields(db, source, clock):
     clock.at += timedelta(minutes=10)
     refresh_once(db, source, clock)
     count = db.conn.execute(
-        "SELECT COUNT(*) FROM item_snapshots WHERE item_key = ?", (ODYLE,)
+        "SELECT COUNT(*) FROM item_snapshots WHERE item_key = ? AND server_id = ?",
+        (ODYLE, SERVER),
     ).fetchone()[0]
     assert count == 1  # same API snapshot, same row
     assert db.watched_keys() == [ODYLE]

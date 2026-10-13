@@ -25,6 +25,26 @@ DEFAULT_SETTINGS: dict[str, str] = {
     "stale_sales_days": "2",
     "collector_failing_runs": "3",
     "sales_refresh_hours": "6",
+    # Pricing model
+    "undercut_step": "1",  # Kina below the cheapest seller
+    "min_sales_units": "10",  # sales needed before the sale average anchors the estimate
+    "sales_window_days": "28",
+    "spike_mads": "3",
+    "spike_persist_refreshes": "3",
+    "depth_units": "10",
+    # Flip finder
+    "flip_min_profit": "5000",
+    "flip_min_roi_pct": "8",
+    "flip_min_days": "3",
+    "flip_min_listings": "5",
+    # Reference servers (same region as mine)
+    "reference_scope": "region_faction",  # 'region_faction' | 'region' | 'off'
+    "reference_refresh_hours": "6",
+    "region_gap_pct": "15",  # how far from the regional median counts as cheap/expensive
+    # Trust
+    "sanity_jump_factor": "5",
+    "sanity_drop_factor": "0.2",
+    "streak_risk": "0.05",  # the 1-in-20 bad streak
 }
 
 
@@ -155,6 +175,45 @@ class Database:
             + "ORDER BY i.name",
             (server_id,),
         ).fetchall()
+
+    def snapshot_history(
+        self, server_id: int, since: datetime, item_key: int | None = None
+    ) -> list[sqlite3.Row]:
+        """Every stored snapshot since a time, oldest first."""
+        return self.conn.execute(
+            "SELECT item_key, captured_at, price, listings, units_sold, sold_avg FROM item_snapshots "
+            "WHERE server_id = ? AND captured_at >= ? "
+            + ("AND item_key = ? " if item_key is not None else "")
+            + "ORDER BY item_key, captured_at",
+            (server_id, iso(since)) + ((item_key,) if item_key is not None else ()),
+        ).fetchall()
+
+    def price_point_history(self, server_id: int, since: datetime) -> list[sqlite3.Row]:
+        return self.conn.execute(
+            "SELECT item_key, ts, close AS price, listings FROM price_points "
+            "WHERE server_id = ? AND ts >= ? ORDER BY item_key, ts",
+            (server_id, iso(since)),
+        ).fetchall()
+
+    def sales_days(self, server_id: int, item_key: int) -> list[sqlite3.Row]:
+        return self.conn.execute(
+            "SELECT * FROM sales_days WHERE server_id = ? AND item_key = ? ORDER BY registered",
+            (server_id, item_key),
+        ).fetchall()
+
+    def reference_server_ids(self, my_server: int) -> list[int]:
+        """Other servers to compare with, per the reference_scope setting."""
+        scope = self.get_setting("reference_scope")
+        if scope == "off":
+            return []
+        rows = self.conn.execute(
+            "SELECT o.id FROM servers o JOIN servers mine ON mine.id = ? "
+            "WHERE o.id != mine.id AND o.region = mine.region "
+            + ("AND o.faction = mine.faction " if scope == "region_faction" else "")
+            + "ORDER BY o.id",
+            (my_server,),
+        )
+        return [r["id"] for r in rows]
 
     def set_watch(self, item_key: int, watch: bool = True) -> None:
         self.conn.execute(
