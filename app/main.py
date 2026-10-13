@@ -1,22 +1,19 @@
-"""Entry point. Until the desktop UI lands (milestone 3) this runs the refresh headless.
+"""Entry point.
 
-    python -m app.main --once         one refresh, print the result
-    python -m app.main --report       one refresh, then print the analysis
-    python -m app.main                keep refreshing on schedule (Ctrl+C to stop)
+    python -m app.main                the desktop window
+    python -m app.main --once         one refresh, print the result, no window
+    python -m app.main --report       one refresh, then print the analysis, no window
     python -m app.main --watch KEY    add an item to the watchlist first
 """
 
 from __future__ import annotations
 
 import argparse
-import signal
 import sys
-
-from PySide6.QtCore import QCoreApplication
 
 from app.db.repo import DEFAULT_DB_PATH, Database
 from app.external.aion2exchange import Aion2ExchangeSource
-from app.external.scheduler import RefreshResult, RefreshWorker, refresh_once
+from app.external.scheduler import RefreshResult, refresh_once
 
 
 def describe(result: RefreshResult) -> str:
@@ -64,14 +61,16 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     db.close()
 
-    app = QCoreApplication(sys.argv[:1])
-    worker = RefreshWorker(args.db, Aion2ExchangeSource)
-    worker.refreshed.connect(lambda result: print(describe(result), flush=True))
-    signal.signal(signal.SIGINT, lambda *_: app.quit())
-    worker.start()
-    code = app.exec()
-    worker.stop()
-    return code
+    from PySide6.QtWidgets import QApplication
+
+    from app.ui.main_window import MainWindow, style_charts
+
+    app = QApplication(sys.argv[:1])
+    app.setApplicationName("AION 2 Market Assistant")
+    style_charts(app)
+    window = MainWindow(args.db, Aion2ExchangeSource)
+    window.show()
+    return app.exec()
 
 
 if __name__ == "__main__":

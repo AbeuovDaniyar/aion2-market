@@ -65,7 +65,7 @@ class Aion2ExchangeSource(PriceSource):
         self, path: str, model: type[M], max_age: timedelta | None = None, **params
     ) -> Fetched[M]:
         params = {k: v for k, v in sorted(params.items()) if v is not None}
-        url = path + ("?" + urlencode(params) if params else "")
+        url = cache_url(path, **params)
         cached = self.db.cache_get(url)
 
         if cached and max_age is not None:
@@ -167,14 +167,21 @@ class Aion2ExchangeSource(PriceSource):
         return _merge(pages) if pages else Fetched([], self._now())
 
     def prices(
-        self, item_key: int, server: int | None = None, bucket: str | None = None
+        self,
+        item_key: int,
+        server: int | None = None,
+        bucket: str | None = None,
+        days: int | None = None,
     ) -> Fetched[m.PriceSeries]:
+        params = {"server": server, "bucket": bucket}
+        if days:
+            # Whole days, so the cache key is stable within a day.
+            start = (self._now() - timedelta(days=days)).replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
+            params["from"] = start.strftime("%Y-%m-%dT%H:%M:%SZ")
         return self._get(
-            f"/api/items/{item_key}/prices",
-            m.PriceSeries,
-            MAX_AGE_HISTORY,
-            server=server,
-            bucket=bucket,
+            f"/api/items/{item_key}/prices", m.PriceSeries, MAX_AGE_HISTORY, **params
         )
 
     def depth(
@@ -258,6 +265,23 @@ class Aion2ExchangeSource(PriceSource):
         if age is None or age > self.db.get_float("stale_listings_hours") * 3600:
             return Freshness("stale", **{"detail": "listings snapshot is old", **fields})
         return Freshness("ok", **{"detail": "", **fields})
+
+
+def cache_url(path: str, **params) -> str:
+    """The api_cache key of a request."""
+    params = {k: v for k, v in sorted(params.items()) if v is not None}
+    return path + ("?" + urlencode(params) if params else "")
+
+
+def read_cached(db: Database, model: type[M], path: str, **params) -> Fetched[M] | None:
+    """The last stored response, without touching the network (for the UI thread)."""
+    row = db.cache_get(cache_url(path, **params))
+    if row is None:
+        return None
+    try:
+        return Fetched(model.model_validate_json(row["body"]), parse_iso(row["fetched_at"]), True)
+    except ValidationError:
+        return None
 
 
 def _merge(pages: list[Fetched[m.ItemList]]) -> Fetched[list[m.ItemSummary]]:

@@ -40,6 +40,8 @@ DEFAULT_SETTINGS: dict[str, str] = {
     # Reference servers (same region as mine)
     "reference_scope": "region_faction",  # 'region_faction' | 'region' | 'off'
     "reference_refresh_hours": "6",
+    # Established servers with sales statistics, as a demand reference (comma separated ids).
+    "demand_reference_servers": "11304",
     "region_gap_pct": "15",  # how far from the regional median counts as cheap/expensive
     # Trust
     "sanity_jump_factor": "5",
@@ -214,6 +216,85 @@ class Database:
             (my_server,),
         )
         return [r["id"] for r in rows]
+
+    def demand_server_ids(self, my_server: int) -> list[int]:
+        """Servers used as a demand reference: they have the sales statistics mine lacks."""
+        raw = self.get_setting("demand_reference_servers") or ""
+        ids = [int(part) for part in raw.replace(";", ",").split(",") if part.strip().isdigit()]
+        return [i for i in dict.fromkeys(ids) if i != my_server]
+
+    def set_notes(self, item_key: int, notes: str) -> None:
+        self.conn.execute("UPDATE items SET notes = ? WHERE item_key = ?", (notes, item_key))
+        self.conn.commit()
+
+    def add_trade(
+        self, item_key: int, side: str, qty: int, unit_price: int, at: datetime,
+        fee_paid: int = 0, done: bool = True, notes: str | None = None,
+    ) -> int:
+        cursor = self.conn.execute(
+            "INSERT INTO trades (item_key, side, qty, unit_price, fee_paid, listed_at, done_at, "
+            "notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (item_key, side, qty, unit_price, fee_paid, iso(at), iso(at) if done else None, notes),
+        )
+        self.conn.commit()
+        return cursor.lastrowid
+
+    # -- recipes (entered by hand) ----------------------------------------------
+
+    def save_recipe(self, recipe: dict, inputs: list[tuple[int, int, int | None]]) -> int:
+        """Insert or update (when recipe has an id). inputs = (item_key, qty, npc_price)."""
+        fields = [
+            "output_key", "output_qty", "success_rate", "combo_probability", "combo_output_key",
+            "combo_output_qty", "kina_cost", "craft_seconds", "profession", "mastery_level",
+            "rate_source", "rate_updated_at", "notes",
+        ]
+        values = [recipe.get(f) for f in fields]
+        for key in [recipe.get("output_key"), recipe.get("combo_output_key")] + [i[0] for i in inputs]:
+            if key:
+                self.conn.execute("INSERT OR IGNORE INTO items (item_key) VALUES (?)", (key,))
+        if recipe.get("id"):
+            self.conn.execute(
+                f"UPDATE recipes SET {', '.join(f + ' = ?' for f in fields)} WHERE id = ?",
+                values + [recipe["id"]],
+            )
+            recipe_id = recipe["id"]
+            self.conn.execute("DELETE FROM recipe_inputs WHERE recipe_id = ?", (recipe_id,))
+        else:
+            recipe_id = self.conn.execute(
+                f"INSERT INTO recipes ({', '.join(fields)}) VALUES ({', '.join('?' * len(fields))})",
+                values,
+            ).lastrowid
+        self.conn.executemany(
+            "INSERT INTO recipe_inputs (recipe_id, item_key, qty, npc_price) VALUES (?, ?, ?, ?)",
+            [(recipe_id, *i) for i in inputs],
+        )
+        self.conn.commit()
+        return recipe_id
+
+    def delete_recipe(self, recipe_id: int) -> None:
+        self.conn.execute("DELETE FROM recipe_inputs WHERE recipe_id = ?", (recipe_id,))
+        self.conn.execute("DELETE FROM recipes WHERE id = ?", (recipe_id,))
+        self.conn.commit()
+
+    def recipes(self) -> list[tuple[sqlite3.Row, list[sqlite3.Row]]]:
+        rows = self.conn.execute("SELECT * FROM recipes ORDER BY id").fetchall()
+        return [
+            (
+                r,
+                self.conn.execute(
+                    "SELECT * FROM recipe_inputs WHERE recipe_id = ? ORDER BY item_key", (r["id"],)
+                ).fetchall(),
+            )
+            for r in rows
+        ]
+
+    def recent_fetches(self, limit: int = 50, errors_only: bool = False) -> list[sqlite3.Row]:
+        return self.conn.execute(
+            "SELECT * FROM fetch_log "
+            + ("WHERE error IS NOT NULL " if errors_only else "")
+            + "ORDER BY id DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
 
     def set_watch(self, item_key: int, watch: bool = True) -> None:
         self.conn.execute(

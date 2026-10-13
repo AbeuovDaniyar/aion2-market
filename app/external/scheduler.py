@@ -1,7 +1,7 @@
 """Refresh worker: runs the source on a schedule, writes to SQLite, signals the UI.
 
-refresh_once() is plain Python so it can be tested without Qt; RefreshWorker
-wraps it in a background QThread with its own database connection.
+refresh_once() and load_item() are plain Python so they can be tested without Qt;
+RefreshWorker wraps them in a background QThread with its own database connection.
 """
 
 from __future__ import annotations
@@ -18,6 +18,8 @@ from PySide6.QtCore import QThread, Signal
 from app.db.repo import Database, parse_iso, utcnow
 from app.external.source import Freshness, PriceSource, SourceError
 
+HISTORY_DAYS = 30  # price history fetched for an item's chart
+
 
 @dataclass(frozen=True)
 class RefreshResult:
@@ -28,7 +30,7 @@ class RefreshResult:
     sales_updated: int = 0
     served_stale: bool = False  # item data came from cache because the API was down
     error: str | None = None
-    reference_updated: int = 0  # other servers in the region refreshed this round
+    reference_updated: int = 0  # other servers refreshed this round
 
 
 def resolve_server(db: Database, source: PriceSource) -> int:
@@ -67,6 +69,9 @@ def refresh_once(
         if freshness.state != "down":
             sales_updated = _refresh_sales(db, source, server_id, now())
             reference_updated = _refresh_reference_servers(db, source, server_id, now())
+            # Kept in the response cache for the Crafting tab, which never waits on the network.
+            source.crafts(server_id)
+            source.crafts_model(server_id)
     except SourceError as exc:
         error = str(exc)
 
@@ -75,26 +80,6 @@ def refresh_once(
         now(), server_id, freshness, items_updated, sales_updated, served_stale, error,
         reference_updated,
     )
-
-
-def _refresh_reference_servers(
-    db: Database, source: PriceSource, server_id: int, now: datetime
-) -> int:
-    """Catalog snapshots of the other servers in the region: one call each, every few hours."""
-    max_age = timedelta(hours=db.get_float("reference_refresh_hours"))
-    updated = 0
-    for other in db.reference_server_ids(server_id):
-        marker = f"reference_refreshed:{other}"
-        last = parse_iso(db.get_setting(marker))
-        if last and now - last < max_age:
-            continue
-        items = source.all_items(other)
-        if items.stale:
-            continue
-        db.save_item_summaries(other, items.data, items.fetched_at)
-        db.set_setting(marker, now.isoformat())
-        updated += 1
-    return updated
 
 
 def _refresh_sales(db: Database, source: PriceSource, server_id: int, now: datetime) -> int:
@@ -117,11 +102,47 @@ def _refresh_sales(db: Database, source: PriceSource, server_id: int, now: datet
     return updated
 
 
+def _refresh_reference_servers(
+    db: Database, source: PriceSource, server_id: int, now: datetime
+) -> int:
+    """Catalog snapshots of the region's other servers and of the demand-reference servers:
+    one call each, every few hours."""
+    max_age = timedelta(hours=db.get_float("reference_refresh_hours"))
+    others = dict.fromkeys(db.reference_server_ids(server_id) + db.demand_server_ids(server_id))
+    updated = 0
+    for other in others:
+        marker = f"reference_refreshed:{other}"
+        last = parse_iso(db.get_setting(marker))
+        if last and now - last < max_age:
+            continue
+        items = source.all_items(other)
+        if items.stale:
+            continue
+        db.save_item_summaries(other, items.data, items.fetched_at)
+        db.set_setting(marker, now.isoformat())
+        updated += 1
+    return updated
+
+
+def load_item(db: Database, source: PriceSource, server_id: int, item_key: int) -> str | None:
+    """On-demand detail for one item's charts: price history, sales days, depth ladder.
+    Returns an error message, or None."""
+    try:
+        prices = source.prices(item_key, server_id, bucket="1h", days=HISTORY_DAYS)
+        db.save_price_series(server_id, prices.data)
+        db.save_volume_series(server_id, source.volume(item_key, server_id).data)
+        source.depth_ladder(item_key, server_id)  # read back from the response cache
+    except SourceError as exc:
+        return str(exc)
+    return None
+
+
 class RefreshWorker(QThread):
-    """Background thread. The UI only talks to it through request_refresh() and signals."""
+    """Background thread. The UI only talks to it through request_*() and signals."""
 
     refreshed = Signal(object)  # RefreshResult
     started_refresh = Signal()
+    item_loaded = Signal(int, object)  # item_key, error message or None
 
     def __init__(
         self,
@@ -132,16 +153,19 @@ class RefreshWorker(QThread):
         super().__init__(parent)
         self._db_path = db_path
         self._source_factory = source_factory
-        self._jobs: queue.Queue[str] = queue.Queue()
+        self._jobs: queue.Queue[tuple] = queue.Queue()
         self.min_manual_gap_s = 60.0
         self.next_refresh_at: datetime | None = None
 
-    def request_refresh(self) -> None:
-        """The "Refresh now" button."""
-        self._jobs.put("refresh")
+    def request_refresh(self, force: bool = False) -> None:
+        """The "Refresh now" button. force skips the minimum gap (server or settings changed)."""
+        self._jobs.put(("force" if force else "refresh",))
+
+    def request_item(self, server_id: int, item_key: int) -> None:
+        self._jobs.put(("item", server_id, item_key))
 
     def stop(self) -> None:
-        self._jobs.put("stop")
+        self._jobs.put(("stop",))
         self.wait()
 
     def run(self) -> None:
@@ -161,10 +185,13 @@ class RefreshWorker(QThread):
                         job = self._jobs.get(timeout=max(0.0, remaining))
                     except queue.Empty:
                         break
-                    if job == "stop":
+                    if job[0] == "stop":
                         return
+                    if job[0] == "item":
+                        self.item_loaded.emit(job[2], load_item(db, source, job[1], job[2]))
+                        continue
                     # Repeated clicks on "Refresh now" must not hammer the API.
-                    if time.monotonic() - last >= self.min_manual_gap_s:
+                    if job[0] == "force" or time.monotonic() - last >= self.min_manual_gap_s:
                         break
         finally:
             close = getattr(source, "close", None)

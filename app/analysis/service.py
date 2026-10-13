@@ -8,7 +8,8 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from statistics import mean
+import sqlite3
+from statistics import mean, median, pstdev
 
 from app.analysis import crafting, flips, merge, pricing, trust
 from app.analysis.fees import Fees
@@ -35,6 +36,7 @@ class ItemView:
     age: trust.Age
     sanity: tuple[str, ...]
     region: merge.RegionComparison | None = None
+    demand: merge.DemandReference | None = None  # established servers with sales statistics
 
     @property
     def usable(self) -> bool:
@@ -84,6 +86,16 @@ def _region(db: Database, server_id: int, now: datetime, my_prices: dict[int, fl
     }
 
 
+def _demand(db: Database, server_id: int, now: datetime):
+    rows: dict[int, list[tuple]] = defaultdict(list)
+    for other in db.demand_server_ids(server_id):
+        for row in db.latest_snapshots(other):
+            if now - parse_iso(row["captured_at"]) <= REFERENCE_MAX_AGE:
+                rows[row["item_key"]].append((row["price"], row["units_sold"], row["sold_avg"]))
+    window_days = db.get_float("sales_window_days")
+    return {key: merge.demand_reference(found, window_days) for key, found in rows.items()}
+
+
 def item_views(
     db: Database,
     server_id: int,
@@ -97,6 +109,7 @@ def item_views(
     daily = _daily_listings_and_sales(db, server_id, now)
     rows = db.latest_snapshots(server_id)
     region = _region(db, server_id, now, {r["item_key"]: r["price"] for r in rows})
+    demand = _demand(db, server_id, now)
     window_days = db.get_float("sales_window_days")
     min_units = int(db.get_float("min_sales_units"))
 
@@ -110,6 +123,11 @@ def item_views(
             tuple(d["units_delta"] for d in db.sales_days(server_id, key) if d["units_delta"]),
         )
         comparison = region.get(key)
+        reference = demand.get(key)
+        # Demand borrowed from elsewhere: the region first, then the established servers.
+        borrowed = comparison.reference_units_per_day if comparison else None
+        if borrowed is None and reference:
+            borrowed = reference.units_per_day
         estimate = pricing.estimate_sale_price(
             row["price"],
             [o.price for o in series],
@@ -126,9 +144,7 @@ def item_views(
             ItemView(
                 key, row["name"], row["section"], row["category_name"], captured_at,
                 row["price"], row["listings"], sales, tuple(series), span, estimate,
-                pricing.sell_through(
-                    sales, series, comparison.reference_units_per_day if comparison else None
-                ),
+                pricing.sell_through(sales, series, borrowed),
                 trust.data_age(
                     now, captured_at, sales_batch_at if sales.available else None,
                     db.get_float("stale_listings_hours"), db.get_float("stale_sales_days"),
@@ -139,9 +155,112 @@ def item_views(
                     drop_factor=db.get_float("sanity_drop_factor"),
                 ),
                 comparison,
+                reference,
             )
         )
     return views
+
+
+@dataclass(frozen=True)
+class PriceStats:
+    median_7d: float | None
+    low_7d: float | None
+    high_7d: float | None
+    change_vs_prev_week_pct: float | None
+    volatility: float | None  # coefficient of variation over 7 days
+
+
+def price_stats(points: list[pricing.Obs], now: datetime) -> PriceStats:
+    """The Items tab stats line. points may span more than 7 days."""
+    week = [o.price for o in pricing.window(points, now, 7)]
+    previous = [o.price for o in points if now - timedelta(days=14) <= o.ts < now - timedelta(days=7)]
+    if not week:
+        return PriceStats(None, None, None, None, None)
+    mid = median(week)
+    change = 100 * (mid - median(previous)) / median(previous) if previous else None
+    spread = pstdev(week) / mean(week) if len(week) > 1 and mean(week) else None
+    return PriceStats(mid, min(week), max(week), change, spread)
+
+
+def chart_points(db: Database, server_id: int, item_key: int) -> list[sqlite3.Row]:
+    """Stored hourly price buckets for one item, oldest first (filled by load_item)."""
+    return db.conn.execute(
+        "SELECT ts, low, high, avg, close, listings FROM price_points "
+        "WHERE server_id = ? AND item_key = ? AND bucket = ? ORDER BY ts",
+        (server_id, item_key, "1h"),
+    ).fetchall()
+
+
+@dataclass(frozen=True)
+class RecipeRow:
+    """A recipe Danny entered by hand, valued with the single-craft EV formula."""
+
+    recipe_id: int
+    name: str
+    success_rate: float | None
+    combo_probability: float
+    materials: float | None  # per attempt
+    ev: float | None  # per attempt
+    margin_pct: float | None
+    per_hour: float | None
+    break_even_rate: float | None
+    streak_budget: float | None
+    saturated: bool
+    flags: tuple[str, ...]
+
+
+def recipe_rows(db: Database, views: list[ItemView]) -> list[RecipeRow]:
+    fees = Fees.from_db(db)
+    risk = db.get_float("streak_risk")
+    by_key = {v.item_key: v for v in views}
+    rows = []
+    for recipe, inputs in db.recipes():
+        flags = []
+        output = by_key.get(recipe["output_key"])
+        combo = by_key.get(recipe["combo_output_key"]) if recipe["combo_output_key"] else output
+        materials: float | None = 0.0
+        for line in inputs:
+            view = by_key.get(line["item_key"])
+            market = view.cheapest if view else None
+            # The cheaper of the Marketplace price and the NPC price.
+            options = [p for p in (market, line["npc_price"]) if p is not None]
+            if not options:
+                materials = None
+                flags.append("materials_not_listed")
+                break
+            materials += line["qty"] * min(options)
+        p_s, p_c = recipe["success_rate"], recipe["combo_probability"] or 0.0
+        if p_s is None:
+            flags.append("rate_unknown")
+        if output is None:
+            flags.append("not_listed_here")
+        ev = margin = per_hour = even = budget = None
+        if p_s is not None and output is not None and materials is not None:
+            fee = recipe["kina_cost"] or 0
+            v_normal = output.estimate.price * (recipe["output_qty"] or 1)
+            v_combo = (combo or output).estimate.price * (
+                recipe["combo_output_qty"] or recipe["output_qty"] or 1
+            )
+            ev = crafting.craft_ev(p_s, p_c, v_normal, v_combo, materials, fee, fees)
+            cost = materials + fee
+            margin = 100 * ev / cost if cost else None
+            if recipe["craft_seconds"]:
+                per_hour = ev * 3600 / recipe["craft_seconds"]
+            even = crafting.break_even_rate(p_c, v_normal, v_combo, materials, fee, fees)
+            budget = crafting.streak_budget(p_s, cost, risk)
+            if output.estimate.confidence == "low":
+                flags.append("low_confidence_price")
+        # Saturation: the output already has many listings or its price is falling.
+        saturated = bool(output) and (
+            output.listings >= 50
+            or (len(output.history) >= 4 and output.history[-1].price < 0.9 * output.history[0].price)
+        )
+        name = (output.name if output else None) or f"item {recipe['output_key']}"
+        rows.append(
+            RecipeRow(recipe["id"], name, p_s, p_c, materials, ev, margin, per_hour, even,
+                      budget, saturated, tuple(flags))
+        )
+    return sorted(rows, key=lambda r: r.ev if r.ev is not None else float("-inf"), reverse=True)
 
 
 def region_gaps(views: list[ItemView], verdict: str = "cheap") -> list[ItemView]:

@@ -58,6 +58,35 @@ def compare_with_region(
 
 
 @dataclass(frozen=True)
+class DemandReference:
+    """What an established server with sales statistics says about an item. A different
+    market: use it for which items move and roughly what they settle at, not as this
+    server's numbers."""
+
+    units_per_day: float | None
+    sold_avg: float | None  # average real sale price there
+    price: float | None  # cheapest listing there
+    servers: int
+
+
+def demand_reference(
+    rows: Sequence[tuple[float | None, int | None, float | None]], window_days: float = 28
+) -> DemandReference | None:
+    """rows = (cheapest price, units_sold, sold_avg) per demand-reference server."""
+    if not rows:
+        return None
+    sold = [u for _, u, _ in rows if u is not None]
+    averages = [a for _, _, a in rows if a]
+    prices = [p for p, _, _ in rows if p]
+    return DemandReference(
+        median(sold) / window_days if sold else None,
+        median(averages) if averages else None,
+        median(prices) if prices else None,
+        len(rows),
+    )
+
+
+@dataclass(frozen=True)
 class MergeShift:
     pre_median: float | None
     post_median: float | None

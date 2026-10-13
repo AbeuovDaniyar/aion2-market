@@ -72,7 +72,11 @@ class PriceSource(ABC):
 
     @abstractmethod
     def prices(
-        self, item_key: int, server: int | None = None, bucket: str | None = None
+        self,
+        item_key: int,
+        server: int | None = None,
+        bucket: str | None = None,
+        days: int | None = None,
     ) -> Fetched[m.PriceSeries]: ...
 
     @abstractmethod
