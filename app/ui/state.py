@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 from PySide6.QtCore import QObject, Signal
 
-from app.analysis import flips, service
+from app.analysis import alerts, flips, service
 from app.analysis.fees import Fees
 from app.db.repo import Database, utcnow
 from app.external import models as m
@@ -31,6 +31,7 @@ class Opportunity:
 
 class AppState(QObject):
     changed = Signal()
+    alerts_raised = Signal(list)  # new alerts since the last reload; not emitted while data is stale
 
     def __init__(self, db: Database, parent=None):
         super().__init__(parent)
@@ -43,6 +44,8 @@ class AppState(QObject):
         self.flips: list[flips.FlipCandidate] = []
         self.crafts: list[service.CraftRow] = []
         self.recipes: list[service.RecipeRow] = []
+        self.alerts: list[alerts.Alert] = []
+        self._alerted: set[str] = set()
         self.opportunities: list[Opportunity] = []
         self.new_opportunities = 0
         self._seen: set[str] | None = None
@@ -76,11 +79,18 @@ class AppState(QObject):
             else []
         )
         self.recipes = service.recipe_rows(self.db, self.views)
+        self.alerts = service.build_alerts(self.db, self.views, self.flips, self.crafts)
         self.opportunities = self._opportunities()
         ids = {o.id for o in self.opportunities}
         self.new_opportunities = 0 if self._seen is None else len(ids - self._seen)
         self._seen = ids
         self.changed.emit()
+        # Alerts pause automatically while the data is stale; they fire once it is fresh again.
+        if not self.alerts_paused:
+            fresh = [a for a in self.alerts if a.id not in self._alerted]
+            self._alerted = {a.id for a in self.alerts}
+            if fresh:
+                self.alerts_raised.emit(fresh)
 
     @property
     def alerts_paused(self) -> bool:
@@ -116,6 +126,11 @@ class AppState(QObject):
     def _opportunities(self) -> list[Opportunity]:
         fees = Fees.from_db(self.db)
         found: list[Opportunity] = []
+        for alert in self.alerts:
+            if alert.kind in ("Undercut", "Price dip", "Supply squeeze"):
+                found.append(
+                    Opportunity(f"Alert: {alert.kind.lower()}", alert.item_key, alert.name, alert.message, None, "medium")
+                )
         for c in self.flips:
             found.append(
                 Opportunity(
@@ -173,4 +188,9 @@ class AppState(QObject):
                 )
         hidden = self.dismissed()
         found = [o for o in found if o.id not in hidden]
-        return sorted(found, key=lambda o: o.profit if o.profit is not None else float("-inf"), reverse=True)
+        # Alerts first, then by expected profit; rows without a number last.
+        return sorted(
+            found,
+            key=lambda o: (o.kind.startswith("Alert"), o.profit if o.profit is not None else float("-inf")),
+            reverse=True,
+        )

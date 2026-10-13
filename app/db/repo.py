@@ -47,6 +47,14 @@ DEFAULT_SETTINGS: dict[str, str] = {
     "sanity_jump_factor": "5",
     "sanity_drop_factor": "0.2",
     "streak_risk": "0.05",  # the 1-in-20 bad streak
+    # Alerts
+    "alert_min_profit": "50000",  # toast for a flip or craft above this profit
+    "dip_pct": "20",  # watched item this far below its 7-day median
+    "squeeze_drop_pct": "40",  # listing count fell this much...
+    "squeeze_days": "3",  # ...over this many days while the price rose
+    "alert_toasts": "1",
+    "alert_sound": "0",
+    "trade_gap_pct": "25",  # a trade this far from the API's sale average is a large gap
 }
 
 
@@ -229,7 +237,7 @@ class Database:
 
     def add_trade(
         self, item_key: int, side: str, qty: int, unit_price: int, at: datetime,
-        fee_paid: int = 0, done: bool = True, notes: str | None = None,
+        fee_paid: int | None = None, done: bool = True, notes: str | None = None,
     ) -> int:
         cursor = self.conn.execute(
             "INSERT INTO trades (item_key, side, qty, unit_price, fee_paid, listed_at, done_at, "
@@ -287,6 +295,110 @@ class Database:
             )
             for r in rows
         ]
+
+    # -- trades -----------------------------------------------------------------
+
+    def trades(self) -> list[sqlite3.Row]:
+        return self.conn.execute(
+            "SELECT t.*, i.name FROM trades t LEFT JOIN items i USING (item_key) "
+            "ORDER BY COALESCE(t.done_at, t.listed_at) DESC, t.id DESC"
+        ).fetchall()
+
+    def update_trade(self, trade_id: int, **fields) -> None:
+        allowed = {"item_key", "side", "qty", "unit_price", "fee_paid", "listed_at", "done_at", "notes"}
+        fields = {k: v for k, v in fields.items() if k in allowed}
+        self.conn.execute(
+            f"UPDATE trades SET {', '.join(k + ' = ?' for k in fields)} WHERE id = ?",
+            [*fields.values(), trade_id],
+        )
+        self.conn.commit()
+
+    def delete_trade(self, trade_id: int) -> None:
+        self.conn.execute("DELETE FROM trades WHERE id = ?", (trade_id,))
+        self.conn.commit()
+
+    # -- holdings, craft outcomes, farming, events ----------------------------------
+
+    def set_holding(self, item_key: int, qty: int, avg_cost: int | None) -> None:
+        self.conn.execute(
+            "UPDATE items SET hold_qty = ?, hold_avg_cost = ? WHERE item_key = ?",
+            (qty, avg_cost, item_key),
+        )
+        self.conn.commit()
+
+    def holdings(self) -> dict[int, sqlite3.Row]:
+        rows = self.conn.execute(
+            "SELECT item_key, watch, hold_qty, hold_avg_cost FROM items "
+            "WHERE watch = 1 OR hold_qty > 0"
+        )
+        return {r["item_key"]: r for r in rows}
+
+    def add_craft_outcome(
+        self, recipe_id: int, attempts: int, successes: int, combos: int, at: datetime,
+        notes: str | None = None,
+    ) -> None:
+        self.conn.execute(
+            "INSERT INTO craft_outcomes (recipe_id, at, attempts, successes, combos, notes) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (recipe_id, iso(at), attempts, successes, combos, notes),
+        )
+        self.conn.commit()
+
+    def craft_outcome_totals(self) -> dict[int, sqlite3.Row]:
+        rows = self.conn.execute(
+            "SELECT recipe_id, SUM(attempts) AS attempts, SUM(successes) AS successes, "
+            "SUM(combos) AS combos, COUNT(*) AS batches FROM craft_outcomes GROUP BY recipe_id"
+        )
+        return {r["recipe_id"]: r for r in rows}
+
+    def add_farm_run(
+        self, route: str, at: datetime, minutes: float, kina: int,
+        drops: list[tuple[int, int]], notes: str | None = None,
+    ) -> int:
+        run_id = self.conn.execute(
+            "INSERT INTO farm_runs (route, at, minutes, kina, notes) VALUES (?, ?, ?, ?, ?)",
+            (route, iso(at), minutes, kina, notes),
+        ).lastrowid
+        self.conn.executemany(
+            "INSERT INTO farm_drops (run_id, item_key, qty) VALUES (?, ?, ?)",
+            [(run_id, key, qty) for key, qty in drops],
+        )
+        self.conn.commit()
+        return run_id
+
+    def farm_runs(self) -> list[tuple[sqlite3.Row, list[sqlite3.Row]]]:
+        runs = self.conn.execute("SELECT * FROM farm_runs ORDER BY at DESC, id DESC").fetchall()
+        return [
+            (r, self.conn.execute("SELECT * FROM farm_drops WHERE run_id = ?", (r["id"],)).fetchall())
+            for r in runs
+        ]
+
+    def delete_farm_run(self, run_id: int) -> None:
+        self.conn.execute("DELETE FROM farm_drops WHERE run_id = ?", (run_id,))
+        self.conn.execute("DELETE FROM farm_runs WHERE id = ?", (run_id,))
+        self.conn.commit()
+
+    def add_event(self, day: str, label: str, kind: str) -> None:
+        self.conn.execute("INSERT INTO events (day, label, kind) VALUES (?, ?, ?)", (day, label, kind))
+        self.conn.commit()
+
+    def delete_event(self, event_id: int) -> None:
+        self.conn.execute("DELETE FROM events WHERE id = ?", (event_id,))
+        self.conn.commit()
+
+    def events(self) -> list[sqlite3.Row]:
+        return self.conn.execute("SELECT * FROM events ORDER BY day").fetchall()
+
+    def full_price_history(self, server_id: int, item_key: int) -> list[sqlite3.Row]:
+        """Every stored price for one item: hourly buckets plus our own snapshots, oldest first."""
+        return self.conn.execute(
+            "SELECT ts, price, listings FROM ("
+            " SELECT ts, close AS price, listings FROM price_points"
+            "  WHERE server_id = :s AND item_key = :k"
+            " UNION SELECT captured_at, price, listings FROM item_snapshots"
+            "  WHERE server_id = :s AND item_key = :k) ORDER BY ts",
+            {"s": server_id, "k": item_key},
+        ).fetchall()
 
     def recent_fetches(self, limit: int = 50, errors_only: bool = False) -> list[sqlite3.Row]:
         return self.conn.execute(

@@ -25,6 +25,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from app.analysis import service
 from app.db.repo import DEFAULT_SETTINGS, utcnow
 from app.ui import tables
 from app.ui.state import AppState
@@ -265,6 +266,9 @@ class CraftingTab(QWidget):
                 Column("Profit per hour", lambda r: r.per_hour, tables.kina),
                 Column("1-in-20 streak budget", lambda r: r.streak_budget, tables.kina),
                 Column("Saturated", lambda r: "yes" if r.saturated else ""),
+                Column("Logged attempts", lambda r: r.logged_attempts or None),
+                Column("Logged rate", lambda r: r.logged.observed_rate if r.logged else None, tables.rate,
+                       "Your own results; flagged when they run well below the expected rate"),
                 Column("Flags", lambda r: tables.flags(r.flags)),
             ],
             dim=lambda r: r.ev is None,
@@ -276,6 +280,9 @@ class CraftingTab(QWidget):
         add.clicked.connect(lambda: self._dialog())
         edit.clicked.connect(self._edit)
         delete.clicked.connect(self._delete)
+        log = QPushButton("Log craft result…")
+        log.clicked.connect(self._log)
+        self._log_button = log
 
         self.note = QLabel()
         self.note.setWordWrap(True)
@@ -285,8 +292,34 @@ class CraftingTab(QWidget):
         layout.addWidget(self.api, 3)
         layout.addWidget(QLabel("<b>My recipes</b> (your own rates from the in-game Expected Probability tab)"))
         layout.addWidget(self.mine, 2)
-        layout.addLayout(_buttons(add, edit, delete))
+        layout.addLayout(_buttons(add, edit, delete, log))
         state.changed.connect(self.refresh)
+
+    def _log(self) -> None:
+        row = self.mine.selected()
+        if row is None:
+            QMessageBox.information(self, "Log craft result", "Select one of your recipes first.")
+            return
+        dialog = QDialog(self)
+        dialog.setWindowTitle(f"Craft result: {row.name}")
+        attempts = QSpinBox(minimum=1, maximum=100000, value=10)
+        successes = QSpinBox(minimum=0, maximum=100000, value=0)
+        combos = QSpinBox(minimum=0, maximum=100000, value=0)
+        form = QFormLayout(dialog)
+        form.addRow("Attempts", attempts)
+        form.addRow("Successes (including COMBOs)", successes)
+        form.addRow("COMBOs", combos)
+        box = QDialogButtonBox(QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel)
+        box.accepted.connect(dialog.accept)
+        box.rejected.connect(dialog.reject)
+        form.addRow(box)
+        if not dialog.exec():
+            return
+        if successes.value() > attempts.value() or combos.value() > successes.value():
+            QMessageBox.warning(self, "Log craft result", "Successes cannot exceed attempts, and COMBOs cannot exceed successes.")
+            return
+        self.state.db.add_craft_outcome(row.recipe_id, attempts.value(), successes.value(), combos.value(), utcnow())
+        self.state.reload()
 
     def refresh(self) -> None:
         self.api.set_rows(self.state.crafts, keep=lambda r: r.target_key)
@@ -467,10 +500,39 @@ class TrustTab(QWidget):
                 f"({sum(1 for v in views if v.demand and v.demand.units_per_day is not None)} of this "
                 "server's items have sales data there).</p>"
             )
-        lines.append(
-            "<h3>Your results against the API</h3><p>Trade and craft-result comparisons appear "
-            "here once you log trades and craft outcomes (milestone 4).</p>"
-        )
+        lines.append("<h3>Your results against the numbers</h3>")
+        checks = service.trade_checks(s.db, views, s.server_id) if s.server_id else []
+        large = [c for c in checks if c.gap.large]
+        if checks:
+            lines.append(
+                f"<p>{len(checks)} of your sales compared with the API's sale statistics; "
+                f"{len(large)} with a large gap.</p><ul>"
+                + "".join(
+                    f"<li>{c.name}: you sold at {c.price:,.0f}, API average {c.api_avg:,.0f} "
+                    f"({tables.pct(c.gap.gap_pct)}){', outside the API range' if c.gap.outside_range else ''}</li>"
+                    for c in large[:15]
+                )
+                + "</ul>"
+            )
+        else:
+            lines.append(
+                "<p>No sales to compare: either none are logged in Trades, or the API has no "
+                "sale statistics for those items on this server.</p>"
+            )
+        logged = [r for r in s.recipes if r.logged]
+        if logged:
+            lines.append(
+                "<ul>"
+                + "".join(
+                    f"<li>{r.name}: {r.logged_attempts} attempts logged, {tables.rate(r.logged.observed_rate)} "
+                    f"success against {tables.rate(r.logged.expected_rate)} expected"
+                    f"{' — well below expected' if r.logged.below_expected else ''}</li>"
+                    for r in logged
+                )
+                + "</ul>"
+            )
+        else:
+            lines.append("<p>No craft results logged yet (Crafting tab, Log craft result).</p>")
         self.text.setHtml("".join(lines))
         self.errors.set_rows(s.db.recent_fetches(50, errors_only=True))
 
@@ -508,7 +570,16 @@ SETTINGS = [
         ("demand_reference_servers", "Demand-reference server ids (comma separated)", "text"),
         ("reference_refresh_hours", "Refresh reference servers every (hours)", "float"),
     ]),
+    ("Alerts", [
+        ("alert_toasts", "Desktop notifications (1 = on, 0 = off)", "float"),
+        ("alert_sound", "Sound with notifications (1 = on, 0 = off)", "float"),
+        ("alert_min_profit", "Notify for a flip or craft above this profit (Kina)", "float"),
+        ("dip_pct", "Watched-item dip below its 7-day median (%)", "float"),
+        ("squeeze_drop_pct", "Supply squeeze: listings fell by (%)", "float"),
+        ("squeeze_days", "Supply squeeze: over (days)", "float"),
+    ]),
     ("Crafting and trust", [
+        ("trade_gap_pct", "A trade this far from the API average is a large gap (%)", "float"),
         ("streak_risk", "Bad-streak risk (0.05 = 1 in 20)", "float"),
         ("sanity_jump_factor", "Flag a price above this multiple of its 7-day median", "float"),
         ("sanity_drop_factor", "Flag a price below this fraction of its 7-day median", "float"),
@@ -538,8 +609,6 @@ class SettingsTab(QWidget):
                 self._widgets[key] = widget
                 form.addRow(label, widget)
             box.addWidget(group)
-        self.cross_server = QCheckBox("The cross-server market has opened (tags new data; used in milestone 4)")
-        box.addWidget(self.cross_server)
         box.addStretch(1)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
@@ -565,7 +634,6 @@ class SettingsTab(QWidget):
                 widget.setCurrentText(value)
             else:
                 widget.setText(value)
-        self.cross_server.setChecked(not defaults and db.get_setting("cross_server_open") == "1")
 
     def _reset(self) -> None:
         self.load(defaults=True)
@@ -587,6 +655,5 @@ class SettingsTab(QWidget):
                 values[key] = value
         for key, value in values.items():
             self.state.db.set_setting(key, value)
-        self.state.db.set_setting("cross_server_open", int(self.cross_server.isChecked()))
         self.message.setText("Saved.")
         self.saved.emit()

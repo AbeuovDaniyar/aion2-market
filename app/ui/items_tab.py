@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from app.analysis import pricing, service
+from app.analysis import farming, pricing, service
 from app.db.repo import parse_iso, utcnow
 from app.ui import tables
 from app.ui.state import AppState
@@ -141,6 +141,15 @@ class ItemsTab(QWidget):
         self.charts.addTab(self.price_chart, "Price")
         self.charts.addTab(depth, "Depth")
         self.charts.addTab(sales, "Sales")
+        self.timing_plot = pg.PlotWidget()
+        self.timing_plot.setLabel("left", "Average price (Kina)")
+        self.timing_note = QLabel()
+        self.timing_note.setWordWrap(True)
+        timing = QWidget()
+        timing_box = QVBoxLayout(timing)
+        timing_box.addWidget(self.timing_note)
+        timing_box.addWidget(self.timing_plot)
+        self.charts.addTab(timing, "Timing")
         self.charts.addTab(notes, "Notes")
 
         right = QWidget()
@@ -275,6 +284,7 @@ class ItemsTab(QWidget):
         self._draw_price(ts, low, avg, listings)
         self._draw_depth(view)
         self._draw_sales(view)
+        self._draw_timing(view)
 
     def _draw_price(self, ts, low, avg, listings) -> None:
         x = [t.timestamp() for t in ts]
@@ -293,8 +303,39 @@ class ItemsTab(QWidget):
         self.price_plot.plot(x, low, pen=pg.mkPen(accent, width=2), name="Lowest", symbol="o" if len(x) < 40 else None, symbolSize=5, symbolBrush=accent)
         width = min((b - a for a, b in zip(x, x[1:])), default=3600) * 0.8
         self.listing_plot.addItem(pg.BarGraphItem(x=x, height=listings, width=width, brush=(128, 128, 128, 150), pen=None))
+        # Danny's event tags (patch, event, merge) as labelled lines.
+        for event in self.state.db.events():
+            at = parse_iso(event["day"] + "T12:00:00Z").timestamp()
+            if x[0] <= at <= x[-1]:
+                self.price_plot.addItem(
+                    pg.InfiniteLine(at, angle=90, movable=False, pen=pg.mkPen("#d9930d", width=1),
+                                    label=event["label"], labelOpts={"position": 0.92, "color": "#d9930d"})
+                )
         self.price_plot.enableAutoRange()
         self.listing_plot.enableAutoRange()
+
+    def _draw_timing(self, view) -> None:
+        self.timing_plot.clear()
+        rows = self.state.db.full_price_history(self.state.server_id, view.item_key)
+        points = [(parse_iso(r["ts"]), r["price"]) for r in rows]
+        profile = farming.timing_profile(points)
+        if profile is None:
+            have = (points[-1][0] - points[0][0]).total_seconds() / 86400 if len(points) > 1 else 0
+            self.timing_note.setText(
+                f"Timing insights need 2+ weeks of price history; this item has {have:.1f} days so far."
+            )
+            return
+        self.timing_note.setText(
+            f"Over {profile.days:.0f} days, prices ran highest on {profile.best_weekday} "
+            f"({profile.weekday_spread_pct:+.0f}% against the average) and around "
+            f"{profile.best_hour:02d}:00 local time. That is when a listing fetches most."
+        )
+        names = list(profile.by_weekday)
+        self.timing_plot.addItem(
+            pg.BarGraphItem(x=list(range(len(names))), height=list(profile.by_weekday.values()),
+                            width=0.6, brush=self.palette().highlight().color(), pen=None)
+        )
+        self.timing_plot.getAxis("bottom").setTicks([list(enumerate(names))])
 
     def _draw_depth(self, view) -> None:
         self.depth_plot.clear()

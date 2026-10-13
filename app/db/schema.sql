@@ -75,3 +75,13 @@ CREATE TABLE IF NOT EXISTS fetch_log (id INTEGER PRIMARY KEY, at TEXT, endpoint 
 CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT);
 
 CREATE INDEX IF NOT EXISTS idx_snapshots_server_time ON item_snapshots (server_id, captured_at);
+
+-- Milestone 4: farming runs and event tags
+CREATE TABLE IF NOT EXISTS farm_runs (
+  id INTEGER PRIMARY KEY, route TEXT, at TEXT, minutes REAL, kina INTEGER DEFAULT 0, notes TEXT
+);
+CREATE TABLE IF NOT EXISTS farm_drops (
+  run_id INTEGER REFERENCES farm_runs(id), item_key INTEGER, qty INTEGER,
+  PRIMARY KEY (run_id, item_key)
+);
+CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, day TEXT, label TEXT, kind TEXT);

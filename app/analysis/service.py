@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 import sqlite3
 from statistics import mean, median, pstdev
 
-from app.analysis import crafting, flips, merge, pricing, trust
+from app.analysis import alerts, crafting, flips, ledger, merge, pricing, trust
 from app.analysis.fees import Fees
 from app.db.repo import Database, parse_iso, utcnow
 from app.external import models as m
@@ -207,12 +207,15 @@ class RecipeRow:
     streak_budget: float | None
     saturated: bool
     flags: tuple[str, ...]
+    logged: crafting.OutcomeCheck | None = None  # Danny's logged results against the rate
+    logged_attempts: int = 0
 
 
 def recipe_rows(db: Database, views: list[ItemView]) -> list[RecipeRow]:
     fees = Fees.from_db(db)
     risk = db.get_float("streak_risk")
     by_key = {v.item_key: v for v in views}
+    outcomes = db.craft_outcome_totals()
     rows = []
     for recipe, inputs in db.recipes():
         flags = []
@@ -256,9 +259,17 @@ def recipe_rows(db: Database, views: list[ItemView]) -> list[RecipeRow]:
             or (len(output.history) >= 4 and output.history[-1].price < 0.9 * output.history[0].price)
         )
         name = (output.name if output else None) or f"item {recipe['output_key']}"
+        logged, attempts = None, 0
+        total = outcomes.get(recipe["id"])
+        if total and total["attempts"]:
+            attempts = total["attempts"]
+            if p_s is not None:
+                logged = crafting.outcome_check(attempts, total["successes"] or 0, p_s)
+                if logged.below_expected:
+                    flags.append("results_below_expected")
         rows.append(
             RecipeRow(recipe["id"], name, p_s, p_c, materials, ev, margin, per_hour, even,
-                      budget, saturated, tuple(flags))
+                      budget, saturated, tuple(flags), logged, attempts)
         )
     return sorted(rows, key=lambda r: r.ev if r.ev is not None else float("-inf"), reverse=True)
 
@@ -377,3 +388,182 @@ def craft_table(
                 )
             )
     return sorted(rows, key=lambda r: r.profit.profit if r.profit else float("-inf"), reverse=True)
+
+
+# -- milestone 4: alerts, watchlist and merge, trust gaps ---------------------------------
+
+
+def build_alerts(
+    db: Database,
+    views: list[ItemView],
+    flip_rows: list[flips.FlipCandidate],
+    craft_rows: list[CraftRow],
+    now: datetime | None = None,
+) -> list[alerts.Alert]:
+    """Everything worth a toast right now. The caller pauses them while data is stale."""
+    now = now or utcnow()
+    by_key = {v.item_key: v for v in views}
+    watched = set(db.watched_keys())
+    found = []
+    for trade in db.trades():
+        view = by_key.get(trade["item_key"])
+        if trade["side"] != "sell" or trade["done_at"] or view is None or not view.usable:
+            continue
+        if alerts.is_undercut(trade["unit_price"], view.cheapest):
+            found.append(
+                alerts.Alert(
+                    "Undercut", view.item_key, view.name or str(view.item_key),
+                    f"your listing at {trade['unit_price']:,.0f} is undercut: cheapest is now "
+                    f"{view.cheapest:,.0f}", trade["id"],
+                )
+            )
+    dip_pct = db.get_float("dip_pct")
+    drop_pct, days = db.get_float("squeeze_drop_pct"), db.get_float("squeeze_days")
+    for view in views:
+        if not view.usable:
+            continue
+        name = view.name or str(view.item_key)
+        if view.item_key in watched and view.history_days >= 1:
+            dip = alerts.price_dip(view.cheapest, view.estimate.median_7d, dip_pct)
+            if dip is not None:
+                found.append(
+                    alerts.Alert(
+                        "Price dip", view.item_key, name,
+                        f"{view.cheapest:,.0f} is {dip:.0f}% below its 7-day median "
+                        f"({view.estimate.median_7d:,.0f})",
+                    )
+                )
+        squeeze = alerts.supply_squeeze(view.history, now, drop_pct, days)
+        if squeeze is not None:
+            found.append(
+                alerts.Alert(
+                    "Supply squeeze", view.item_key, name,
+                    f"listings down {squeeze:.0f}% in {days:.0f} days while the price rose",
+                )
+            )
+    threshold = db.get_float("alert_min_profit")
+    for flip in flip_rows:
+        if flip.confidence != "low" and max(flip.profit, flip.horizon_profit) >= threshold:
+            found.append(
+                alerts.Alert(
+                    "Flip", flip.item_key, flip.name or str(flip.item_key),
+                    f"buy at {flip.buy_price:,.0f}, resell near {flip.resale_target:,.0f} "
+                    f"({flip.profit:,.0f} profit per unit)",
+                )
+            )
+    for row in craft_rows:
+        if row.profit and row.profit.profit >= threshold and "low_confidence_price" not in row.flags:
+            found.append(
+                alerts.Alert(
+                    "Craft", row.target_key, row.name or str(row.target_key),
+                    f"expected profit {row.profit.profit:,.0f} per finished item",
+                )
+            )
+    return found
+
+
+@dataclass(frozen=True)
+class WatchRow:
+    view: ItemView
+    watched: bool
+    holding: merge.Holding | None
+    avg_cost: float | None
+    shift: merge.MergeShift | None  # before and after the cross-server market opened
+
+
+def merge_opened_at(db: Database) -> datetime | None:
+    if db.get_setting("cross_server_open") != "1":
+        return None
+    return parse_iso(db.get_setting("cross_server_opened_at"))
+
+
+def set_merge_open(db: Database, server_id: int, is_open: bool, now: datetime | None = None) -> None:
+    """Marks the cross-server market as open from now on; data after this is post-merge."""
+    db.set_setting("cross_server_open", int(is_open))
+    if is_open and not db.get_setting("cross_server_opened_at"):
+        db.set_setting("cross_server_opened_at", (now or utcnow()).isoformat())
+    if not is_open:
+        db.set_setting("cross_server_opened_at", "")
+    db.conn.execute("UPDATE servers SET is_cross_server = ? WHERE id = ?", (int(is_open), server_id))
+    db.conn.commit()
+
+
+def watch_rows(db: Database, views: list[ItemView], server_id: int) -> list[WatchRow]:
+    """Watched and held items with their current value and merge comparison."""
+    fees = Fees.from_db(db)
+    opened = merge_opened_at(db)
+    held = db.holdings()
+    rows = []
+    for view in views:
+        entry = held.get(view.item_key)
+        if entry is None:
+            continue
+        qty = entry["hold_qty"] or 0
+        holding = (
+            merge.hold_value(qty, entry["hold_avg_cost"], view.estimate.price, fees) if qty else None
+        )
+        shift = None
+        if opened:
+            history = db.full_price_history(server_id, view.item_key)
+            pre = [h["price"] for h in history if parse_iso(h["ts"]) < opened]
+            post = [h["price"] for h in history if parse_iso(h["ts"]) >= opened]
+            shift = merge.merge_shift(pre, post)
+        rows.append(WatchRow(view, bool(entry["watch"]), holding, entry["hold_avg_cost"], shift))
+    return rows
+
+
+def server_prices(db: Database, server_id: int, item_key: int, now: datetime | None = None):
+    """(server name, cheapest price, listings) for this item on every reference server."""
+    now = now or utcnow()
+    names = {s["id"]: s["name"] for s in db.servers()}
+    ids = db.reference_server_ids(server_id) + db.demand_server_ids(server_id)
+    found = []
+    for other in dict.fromkeys(ids):
+        row = db.conn.execute(
+            "SELECT price, listings, captured_at FROM item_snapshots WHERE server_id = ? AND "
+            "item_key = ? ORDER BY captured_at DESC LIMIT 1",
+            (other, item_key),
+        ).fetchone()
+        if row and now - parse_iso(row["captured_at"]) <= REFERENCE_MAX_AGE:
+            found.append((names.get(other, str(other)), row["price"], row["listings"]))
+    return sorted(found, key=lambda r: r[1])
+
+
+@dataclass(frozen=True)
+class TradeCheck:
+    trade_id: int
+    name: str
+    price: float
+    api_avg: float | None
+    gap: trust.TradeGap
+
+
+def trade_checks(db: Database, views: list[ItemView], server_id: int) -> list[TradeCheck]:
+    """Danny's completed sales against the API's sale statistics for the same item and day."""
+    by_key = {v.item_key: v for v in views}
+    large = db.get_float("trade_gap_pct")
+    found = []
+    for trade in db.trades():
+        if trade["side"] != "sell" or not trade["done_at"]:
+            continue
+        day = trade["done_at"][:10]
+        stats = None
+        for row in db.sales_days(server_id, trade["item_key"]):
+            if row["registered"][:10] <= day:
+                stats = (row["avg_price"], row["min_price"], row["max_price"])
+        view = by_key.get(trade["item_key"])
+        if stats is None and view and view.sales.available:
+            stats = (view.sales.avg_price, view.sales.min_price, view.sales.max_price)
+        if stats is None or stats[0] is None:
+            continue
+        found.append(
+            TradeCheck(
+                trade["id"], trade["name"] or str(trade["item_key"]), trade["unit_price"], stats[0],
+                trust.trade_gap(trade["unit_price"], *stats, large_pct=large),
+            )
+        )
+    return found
+
+
+def realized(db: Database) -> list[ledger.Realized]:
+    return ledger.realized_profit(db.trades(), Fees.from_db(db))

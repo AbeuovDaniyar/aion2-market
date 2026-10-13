@@ -5,8 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pyqtgraph as pg
-from PySide6.QtCore import QTimer
-from PySide6.QtGui import QPalette
+from PySide6.QtCore import QEvent, Qt, QTimer
+from PySide6.QtGui import QAction, QColor, QIcon, QPainter, QPalette, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QComboBox,
@@ -14,7 +14,9 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QMainWindow,
+    QMenu,
     QPushButton,
+    QSystemTrayIcon,
     QTabWidget,
     QVBoxLayout,
     QWidget,
@@ -24,6 +26,7 @@ from app.db.repo import Database, utcnow
 from app.external.scheduler import RefreshResult, RefreshWorker
 from app.ui import tables
 from app.ui.items_tab import ItemsTab
+from app.ui.more_tabs import ToolsTab, TradesTab, WatchlistTab
 from app.ui.state import AppState
 from app.ui.tabs import CraftingTab, FlipsTab, OpportunitiesTab, SettingsTab, TrustTab
 
@@ -139,6 +142,9 @@ class MainWindow(QMainWindow):
         self.items = ItemsTab(self.state, self.worker.request_item)
         self.crafting = CraftingTab(self.state)
         self.flips = FlipsTab(self.state)
+        self.watchlist = WatchlistTab(self.state)
+        self.trades = TradesTab(self.state)
+        self.tools = ToolsTab(self.state)
         self.trust = TrustTab(self.state)
         self.settings = SettingsTab(self.state)
         self.tabs = QTabWidget()
@@ -147,6 +153,9 @@ class MainWindow(QMainWindow):
             (self.items, "Items"),
             (self.crafting, "Crafting"),
             (self.flips, "Flips"),
+            (self.watchlist, "Watchlist and merge"),
+            (self.trades, "Trades"),
+            (self.tools, "Tools"),
             (self.trust, "Trust"),
             (self.settings, "Settings"),
         ):
@@ -161,6 +170,27 @@ class MainWindow(QMainWindow):
 
         self.opportunities.open_item.connect(self.open_item)
         self.flips.open_item.connect(self.open_item)
+        self.watchlist.open_item.connect(self.open_item)
+        self.state.alerts_raised.connect(self._notify)
+        self.notified: list[str] = []  # toast texts, newest last
+
+        icon = app_icon()
+        self.setWindowIcon(icon)
+        self.tray = QSystemTrayIcon(icon, self)
+        self.tray.setToolTip("AION 2 Market Assistant")
+        menu = QMenu(self)
+        show = QAction("Show", self)
+        show.triggered.connect(self.restore)
+        quit_ = QAction("Quit", self)
+        quit_.triggered.connect(self.close)
+        menu.addAction(show)
+        menu.addAction(quit_)
+        self.tray.setContextMenu(menu)
+        self.tray.activated.connect(
+            lambda reason: self.restore() if reason == QSystemTrayIcon.ActivationReason.Trigger else None
+        )
+        self.tray.messageClicked.connect(self._toast_clicked)
+        self.tray.show()
         self.settings.saved.connect(self._settings_saved)
         self.items.watch_changed.connect(self.state.reload)
         self.state.changed.connect(self._update_banner)
@@ -195,7 +225,43 @@ class MainWindow(QMainWindow):
         else:
             self.banner.hide()
 
+    # -- tray and notifications -------------------------------------------------------
+
+    def restore(self) -> None:
+        self.showNormal()
+        self.raise_()
+        self.activateWindow()
+
+    def changeEvent(self, event) -> None:
+        """Minimizing sends the window to the tray; alerts keep running there."""
+        super().changeEvent(event)
+        if (
+            event.type() == QEvent.Type.WindowStateChange
+            and self.isMinimized()
+            and QSystemTrayIcon.isSystemTrayAvailable()
+        ):
+            QTimer.singleShot(0, self.hide)
+
+    def _toast_clicked(self) -> None:
+        self.restore()
+        self.tabs.setCurrentWidget(self.opportunities)
+
+    def _notify(self, fresh: list) -> None:
+        if len(fresh) == 1:
+            title, text = f"{fresh[0].kind}: {fresh[0].name}", fresh[0].message
+        else:
+            title = f"{len(fresh)} new market alerts"
+            text = "\n".join(f"{a.kind}: {a.name}" for a in fresh[:4])
+            if len(fresh) > 4:
+                text += f"\n…and {len(fresh) - 4} more"
+        self.notified.append(f"{title}\n{text}")
+        if self.db.get_float("alert_toasts"):
+            self.tray.showMessage(title, text, QSystemTrayIcon.MessageIcon.Information, 10_000)
+            if self.db.get_float("alert_sound"):
+                QApplication.beep()
+
     def closeEvent(self, event) -> None:
+        self.tray.hide()
         self.worker.stop()
         self.db.close()
         super().closeEvent(event)
@@ -209,3 +275,22 @@ def style_charts(app: QApplication) -> None:
         background=palette.color(QPalette.ColorRole.Base),
         foreground=palette.color(QPalette.ColorRole.Text),
     )
+
+
+def app_icon() -> QIcon:
+    """A plain coin-coloured disc with a K, drawn here so no image file is needed."""
+    pixmap = QPixmap(64, 64)
+    pixmap.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(pixmap)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+    painter.setBrush(QColor("#d9a520"))
+    painter.setPen(QColor("#8a6508"))
+    painter.drawEllipse(4, 4, 56, 56)
+    font = painter.font()
+    font.setPixelSize(36)
+    font.setBold(True)
+    painter.setFont(font)
+    painter.setPen(QColor("#3b2a00"))
+    painter.drawText(pixmap.rect(), Qt.AlignmentFlag.AlignCenter, "K")
+    painter.end()
+    return QIcon(pixmap)
