@@ -41,10 +41,12 @@ def describe(result: RefreshResult) -> str:
 def seed_new_install(db_path: str) -> None:
     """First run of the packaged exe: start from the history bundled into it
     (packaging/make_seed.py) instead of an empty database."""
-    seed = Path(getattr(sys, "_MEIPASS", "")) / "seed" / "market.db"
-    if getattr(sys, "frozen", False) and seed.is_file() and not Path(db_path).exists():
+    seed = Path(getattr(sys, "_MEIPASS", "")) / "seed"
+    if getattr(sys, "frozen", False) and (seed / "market.db").is_file() and not Path(db_path).exists():
         Path(db_path).parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(seed, db_path)
+        if (seed / "icons").is_dir():
+            shutil.copytree(seed / "icons", icons_dir(db_path), dirs_exist_ok=True)
+        shutil.copyfile(seed / "market.db", db_path)
 
 
 def main(argv: list[str] | None = None) -> int:

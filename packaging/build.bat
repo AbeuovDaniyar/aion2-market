@@ -7,7 +7,7 @@ set PY=.venv\Scripts\python.exe
 %PY% packaging\make_icon.py || goto :error
 %PY% packaging\make_seed.py || goto :error
 set SEED=
-if exist packaging\seed\market.db set SEED=--add-data "packaging\seed\market.db;seed"
+if exist packaging\seed\market.db set SEED=--add-data "packaging\seed;seed"
 %PY% -m PyInstaller --noconfirm --clean --onefile --windowed ^
   --name AION2MarketAssistant ^
   --icon packaging\app.ico ^
