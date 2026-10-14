@@ -24,3 +24,5 @@ Thumbs.db
 
 # Downloaded game icons (NCSOFT artwork; local use only)
 data/icons/
+packaging/seed/
+packaging/app.ico

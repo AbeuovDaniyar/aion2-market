@@ -9,7 +9,9 @@
 from __future__ import annotations
 
 import argparse
+import shutil
 import sys
+from pathlib import Path
 
 from app.db.repo import DEFAULT_DB_PATH, Database, icons_dir
 from app.external.aion2exchange import Aion2ExchangeSource
@@ -36,6 +38,15 @@ def describe(result: RefreshResult) -> str:
     return line
 
 
+def seed_new_install(db_path: str) -> None:
+    """First run of the packaged exe: start from the history bundled into it
+    (packaging/make_seed.py) instead of an empty database."""
+    seed = Path(getattr(sys, "_MEIPASS", "")) / "seed" / "market.db"
+    if getattr(sys, "frozen", False) and seed.is_file() and not Path(db_path).exists():
+        Path(db_path).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(seed, db_path)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="AION 2 Market Assistant")
     parser.add_argument("--db", default=str(DEFAULT_DB_PATH))
@@ -44,6 +55,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--watch", type=int, action="append", default=[], metavar="ITEM_KEY")
     args = parser.parse_args(argv)
 
+    seed_new_install(args.db)
     db = Database(args.db)
     for key in args.watch:
         db.set_watch(key)

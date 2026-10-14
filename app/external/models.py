@@ -259,7 +259,8 @@ class ItemSummary(BaseModel):
     name: str | None = Field(..., title='Name')
     category: CategoryRef
     group: str | None = Field(..., title='Group')
-    price: float = Field(..., title='Price')
+    # The live API sends null for items with no listings (the saved spec says required).
+    price: float | None = Field(..., title='Price')
     listings: int = Field(..., title='Listings')
     captured_at: AwareDatetime = Field(..., title='Captured At')
     change_pct: float | None = Field(..., title='Change Pct')

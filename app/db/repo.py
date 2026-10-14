@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import os
 import sqlite3
+import sys
 from collections.abc import Iterable
 from datetime import UTC, datetime
 from pathlib import Path
@@ -10,7 +12,18 @@ from pathlib import Path
 from app.external import models as m
 
 SCHEMA_PATH = Path(__file__).with_name("schema.sql")
-DEFAULT_DB_PATH = Path(__file__).resolve().parents[2] / "data" / "market.db"
+
+
+def _default_db_path() -> Path:
+    """The repo's data folder when run from source; the user's AppData folder when run as
+    the packaged exe (which unpacks to a temporary folder on every start)."""
+    if getattr(sys, "frozen", False):
+        base = Path(os.environ.get("LOCALAPPDATA") or Path.home()) / "AION2 Market Assistant"
+        return base / "market.db"
+    return Path(__file__).resolve().parents[2] / "data" / "market.db"
+
+
+DEFAULT_DB_PATH = _default_db_path()
 
 
 def icons_dir(db_path: str | Path) -> Path:
@@ -180,6 +193,7 @@ class Database:
                     iso(fetched_at),
                 )
                 for i in items
+                if i.price is not None  # not on the market right now: catalog row only
             ],
         )
         self.conn.commit()
