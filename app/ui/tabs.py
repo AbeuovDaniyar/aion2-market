@@ -271,6 +271,8 @@ class CraftingTab(QWidget):
                 Column("Break-even rate", lambda r: r.break_even_rate, tables.rate,
                        "The success rate at which this craft earns nothing"),
                 Column("COMBO", lambda r: r.combo_probability, tables.rate),
+                Column("COMBO result", lambda r: f"{r.combo_name} ×{r.combo_qty}" if r.combo_name else None,
+                       tip="What a COMBO yields; its value is part of this recipe's expected value"),
                 Column("Materials", lambda r: r.materials, tables.kina),
                 Column("EV per attempt", lambda r: r.ev, tables.kina),
                 Column("Margin", lambda r: r.margin_pct, tables.pct),
@@ -433,8 +435,8 @@ class CraftingTab(QWidget):
         QMessageBox.information(
             self, "Import all recipes",
             f"Imported {result.recipes:,} recipes for your faction "
-            f"({result.skipped_other_race:,} of the other faction and {result.skipped_empty:,} "
-            "COMBO-result entries left out). "
+            f"({result.skipped_other_race:,} of the other faction left out); "
+            f"{result.combo_attached:,} COMBO results attached to their main recipes. "
             + (f"Kept your own rate on {result.kept_own_rates}. " if result.kept_own_rates else "")
             + "Success rates are estimates until you set your own.",
         )

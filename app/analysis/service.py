@@ -215,6 +215,8 @@ class RecipeRow:
     mastery_level: int | None = None
     rate_source: str | None = None  # 'manual' (yours) | 'estimated' (imported default)
     imported: bool = False
+    combo_name: str | None = None  # what a COMBO yields instead of the normal output
+    combo_qty: int | None = None
 
 
 def recipe_rows(db: Database, views: list[ItemView]) -> list[RecipeRow]:
@@ -223,7 +225,9 @@ def recipe_rows(db: Database, views: list[ItemView]) -> list[RecipeRow]:
     by_key = {v.item_key: v for v in views}
     outcomes = db.craft_outcome_totals()
     recipes = db.recipes()
-    names = db.item_names({r["output_key"] for r, _ in recipes})
+    names = db.item_names(
+        {r["output_key"] for r, _ in recipes} | {r["combo_output_key"] for r, _ in recipes if r["combo_output_key"]}
+    )
     rows = []
     for recipe, inputs in recipes:
         flags = []
@@ -281,7 +285,9 @@ def recipe_rows(db: Database, views: list[ItemView]) -> list[RecipeRow]:
             RecipeRow(recipe["id"], recipe["output_key"], name, p_s, p_c, materials, ev, margin, per_hour, even,
                       budget, saturated, tuple(flags), logged, attempts, recipe["output_grade"],
                       recipe["profession"], recipe["mastery_level"], recipe["rate_source"],
-                      recipe["api_recipe_id"] is not None)
+                      recipe["api_recipe_id"] is not None,
+                      (combo.name if combo else None) or names.get(recipe["combo_output_key"]) if recipe["combo_output_key"] else None,
+                      (recipe["combo_output_qty"] or recipe["output_qty"]) if recipe["combo_output_key"] else None)
         )
     return sorted(rows, key=lambda r: r.ev if r.ev is not None else float("-inf"), reverse=True)
 

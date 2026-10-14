@@ -34,7 +34,8 @@ class ImportResult:
     recipes: int
     skipped_other_race: int
     kept_own_rates: int
-    skipped_empty: int
+    combo_attached: int  # COMBO-result entries folded into their main recipe
+    orphans: int  # entries without ingredients and no main recipe to attach to
     professions: dict[str, int]
 
 
@@ -123,7 +124,27 @@ def import_graph(db: Database, source: str | Path | dict, server_id: int) -> Imp
          if str(k).isdigit() and isinstance(v, dict) and v.get("g") in grade_names],
     )
 
-    imported = other_race = kept = skipped_empty = 0
+    # Entries without ingredients are COMBO results: they belong to the main recipe whose
+    # COMBO gives that item (graph["byCombo"]), and say how many a COMBO yields.
+    by_combo = graph.get("byCombo") or {}
+    combo_qty: dict[str, int] = {}
+    for recipe_id, r in recipes.items():
+        if isinstance(r, dict) and not r.get("in") and r.get("out"):
+            parent = by_combo.get(str(r["out"]))
+            if parent is None:  # older files: the main recipe of the same race with this COMBO
+                parent = next(
+                    (pid for pid, p in recipes.items()
+                     if isinstance(p, dict) and p.get("in") and str(p.get("combo")) == str(r["out"])
+                     and p.get("qr") == r.get("qr")),
+                    None,
+                )
+            if parent is not None:
+                combo_qty[str(parent)] = int(r.get("outq") or 1)
+
+    combo_items = set(by_combo) | {
+        str(p["combo"]) for p in recipes.values() if isinstance(p, dict) and p.get("combo")
+    }
+    imported = other_race = kept = combo_attached = orphans = 0
     professions: Counter[str] = Counter()
     for recipe_id, r in recipes.items():
         if not str(recipe_id).isdigit() or not isinstance(r, dict) or not r.get("out"):
@@ -147,8 +168,12 @@ def import_graph(db: Database, source: str | Path | dict, server_id: int) -> Imp
                 kina_fee += int(line[1])
                 continue
             inputs[int(line[0])] = inputs.get(int(line[0]), 0) + int(line[1])
-        if not inputs and kina_fee == int(r.get("gold") or 0) and not r.get("in"):
-            skipped_empty += 1  # a COMBO or by-product entry, not a recipe you can craft
+        if not r.get("in"):
+            # A COMBO result, attached to its main recipe above.
+            if str(r["out"]) in combo_items:
+                combo_attached += 1
+            else:
+                orphans += 1
             continue
         for key in [int(r["out"])] + ([int(r["combo"])] if r.get("combo") else []) + list(inputs):
             db.conn.execute("INSERT OR IGNORE INTO items (item_key) VALUES (?)", (key,))
@@ -158,7 +183,8 @@ def import_graph(db: Database, source: str | Path | dict, server_id: int) -> Imp
             "rate_source, rate_updated_at, api_recipe_id, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 int(r["out"]), int(r.get("outq") or 1), rate, (r.get("cp") or 0) / 10000,
-                int(r["combo"]) if r.get("combo") else None, None, kina_fee,
+                int(r["combo"]) if r.get("combo") else None,
+                combo_qty.get(str(recipe_id)) if r.get("combo") else None, kina_fee,
                 r.get("p"), level, source, updated, api_id, SOURCE,
             ),
         )
@@ -170,4 +196,4 @@ def import_graph(db: Database, source: str | Path | dict, server_id: int) -> Imp
         professions[r.get("p") or "unknown"] += 1
     db.conn.commit()
     db.set_setting("recipes_imported_at", now)
-    return ImportResult(imported, other_race, kept, skipped_empty, dict(professions))
+    return ImportResult(imported, other_race, kept, combo_attached, orphans, dict(professions))

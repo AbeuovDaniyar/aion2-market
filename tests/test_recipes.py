@@ -127,10 +127,13 @@ REAL = {
         "514075001": {"p": "cooking", "qr": "light", "mg": "beginner", "ml": 25, "gold": 800,
                       "in": [["610680045", 5, None], ["630554001", 3, None]],
                       "out": "510616003", "outq": 1, "cp": 3000, "combo": "510616003"},
+        "534075001": {"p": "cooking", "qr": "light", "mg": "beginner", "ml": 25, "gold": 0,
+                      "in": [], "out": "510616003", "outq": 2, "cp": 0, "combo": None},
         "524076001": {"p": "cooking", "qr": "dark", "mg": "beginner", "ml": 1, "gold": 200,
                       "in": [["610680051", 1, None], ["630554001", 1, None]],
                       "out": "510616005", "outq": 1, "cp": 3000, "combo": "510616005"},
     },
+    "byCombo": {"110220006": "111012001", "510616003": "514075001"},
 }
 
 
@@ -138,7 +141,7 @@ def test_real_entries_import_correctly(db):
     db.conn.execute("INSERT INTO servers (id, api_server_id, name, faction) VALUES (12107, 12107, 'Ereshkigal', 'Asmodian')")
     db.conn.execute("INSERT INTO servers (id, api_server_id, name, faction) VALUES (11304, 11304, 'X', 'Elyos')")
     result = import_graph(db, json.dumps(REAL), 11304)  # pasted text works too
-    assert (result.recipes, result.skipped_other_race, result.skipped_empty) == (2, 1, 1)
+    assert (result.recipes, result.skipped_other_race, result.combo_attached) == (2, 1, 2)
     recipes = {r["api_recipe_id"]: (r, i) for r, i in db.recipes()}
     upgrade, inputs = recipes[111013011]
     assert upgrade["kina_cost"] == 1_004_000  # the Kina ingredient is a fee
@@ -146,6 +149,10 @@ def test_real_entries_import_correctly(db):
     assert upgrade["output_grade"] == "Unique"  # code 41: yellow
     juice, _ = recipes[514075001]
     assert juice["output_grade"] == "Rare" and juice["combo_probability"] == 0.3  # green
+    assert juice["combo_output_qty"] == 2  # a cooking COMBO yields two
+    rows = {r.recipe_id: r for r in service.recipe_rows(db, [])}
+    row = rows[juice["id"]]
+    assert (row.combo_name, row.combo_qty) == ("Artisan's Mela Juice", 2)
 
     result = import_graph(db, REAL, 12107)  # Asmodian: the dark recipe instead
     assert {r["api_recipe_id"] for r, _ in db.recipes()} == {524076001}
