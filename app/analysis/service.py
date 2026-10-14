@@ -210,6 +210,11 @@ class RecipeRow:
     flags: tuple[str, ...]
     logged: crafting.OutcomeCheck | None = None  # Danny's logged results against the rate
     logged_attempts: int = 0
+    grade: str | None = None
+    profession: str | None = None
+    mastery_level: int | None = None
+    rate_source: str | None = None  # 'manual' (yours) | 'estimated' (imported default)
+    imported: bool = False
 
 
 def recipe_rows(db: Database, views: list[ItemView]) -> list[RecipeRow]:
@@ -217,8 +222,10 @@ def recipe_rows(db: Database, views: list[ItemView]) -> list[RecipeRow]:
     risk = db.get_float("streak_risk")
     by_key = {v.item_key: v for v in views}
     outcomes = db.craft_outcome_totals()
+    recipes = db.recipes()
+    names = db.item_names({r["output_key"] for r, _ in recipes})
     rows = []
-    for recipe, inputs in db.recipes():
+    for recipe, inputs in recipes:
         flags = []
         output = by_key.get(recipe["output_key"])
         combo = by_key.get(recipe["combo_output_key"]) if recipe["combo_output_key"] else output
@@ -259,7 +266,9 @@ def recipe_rows(db: Database, views: list[ItemView]) -> list[RecipeRow]:
             output.listings >= 50
             or (len(output.history) >= 4 and output.history[-1].price < 0.9 * output.history[0].price)
         )
-        name = (output.name if output else None) or f"item {recipe['output_key']}"
+        name = (output.name if output else None) or names.get(recipe["output_key"]) or f"item {recipe['output_key']}"
+        if recipe["rate_source"] == "estimated":
+            flags.append("estimated_rate")
         logged, attempts = None, 0
         total = outcomes.get(recipe["id"])
         if total and total["attempts"]:
@@ -270,7 +279,9 @@ def recipe_rows(db: Database, views: list[ItemView]) -> list[RecipeRow]:
                     flags.append("results_below_expected")
         rows.append(
             RecipeRow(recipe["id"], recipe["output_key"], name, p_s, p_c, materials, ev, margin, per_hour, even,
-                      budget, saturated, tuple(flags), logged, attempts)
+                      budget, saturated, tuple(flags), logged, attempts, recipe["output_grade"],
+                      recipe["profession"], recipe["mastery_level"], recipe["rate_source"],
+                      recipe["api_recipe_id"] is not None)
         )
     return sorted(rows, key=lambda r: r.ev if r.ev is not None else float("-inf"), reverse=True)
 

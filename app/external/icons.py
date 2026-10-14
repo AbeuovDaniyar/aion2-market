@@ -104,6 +104,8 @@ class IconFetcher:
             "INSERT OR REPLACE INTO item_icons (item_key, file, grade, checked_at) VALUES (?, ?, ?, ?)",
             (item_key, file, (entry or {}).get("grade"), utcnow().isoformat()),
         )
+        if (entry or {}).get("grade"):
+            self.db.conn.execute("UPDATE items SET grade = ? WHERE item_key = ?", (entry["grade"], item_key))
         self.db.conn.commit()
 
     def _download(self, url: str) -> str | None:

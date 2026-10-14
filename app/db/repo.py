@@ -96,6 +96,9 @@ class Database:
         self.conn.execute("PRAGMA journal_mode=WAL")
         self.conn.execute("PRAGMA foreign_keys=ON")
         self.conn.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
+        columns = {r["name"] for r in self.conn.execute("PRAGMA table_info(items)")}
+        if "grade" not in columns:  # added after the first release of the schema
+            self.conn.execute("ALTER TABLE items ADD COLUMN grade TEXT")
         self.conn.executemany(
             "INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)",
             DEFAULT_SETTINGS.items(),
@@ -294,16 +297,22 @@ class Database:
         self.conn.commit()
 
     def recipes(self) -> list[tuple[sqlite3.Row, list[sqlite3.Row]]]:
-        rows = self.conn.execute("SELECT * FROM recipes ORDER BY id").fetchall()
-        return [
-            (
-                r,
-                self.conn.execute(
-                    "SELECT * FROM recipe_inputs WHERE recipe_id = ? ORDER BY item_key", (r["id"],)
-                ).fetchall(),
-            )
-            for r in rows
-        ]
+        rows = self.conn.execute(
+            "SELECT r.*, i.grade AS output_grade FROM recipes r "
+            "LEFT JOIN items i ON i.item_key = r.output_key ORDER BY r.id"
+        ).fetchall()
+        inputs: dict[int, list[sqlite3.Row]] = {}
+        for line in self.conn.execute("SELECT * FROM recipe_inputs ORDER BY recipe_id, item_key"):
+            inputs.setdefault(line["recipe_id"], []).append(line)
+        return [(r, inputs.get(r["id"], [])) for r in rows]
+
+    def item_names(self, keys) -> dict[int, str]:
+        keys = list(keys)
+        if not keys:
+            return {}
+        marks = ",".join("?" * len(keys))
+        rows = self.conn.execute(f"SELECT item_key, name FROM items WHERE item_key IN ({marks})", keys)
+        return {r["item_key"]: r["name"] for r in rows if r["name"]}
 
     # -- trades -----------------------------------------------------------------
 

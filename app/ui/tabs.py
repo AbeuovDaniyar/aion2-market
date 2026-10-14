@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
     QDoubleSpinBox,
+    QFileDialog,
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
@@ -27,6 +28,9 @@ from PySide6.QtWidgets import (
 )
 
 from app.analysis import service
+
+# Lowest to highest, for sorting the grade filter.
+GRADE_ORDER = {"Common": 0, "Rare": 1, "Legend": 2, "Unique": 3, "Epic": 4}
 from app.db.repo import DEFAULT_SETTINGS, utcnow
 from app.ui import tables
 from app.ui.state import AppState
@@ -257,7 +261,12 @@ class CraftingTab(QWidget):
         self.mine = Table(
             [
                 Column("Output", lambda r: r.name, icon=lambda r: state.icon(r.output_key)),
+                Column("Grade", lambda r: r.grade),
+                Column("Profession", lambda r: (r.profession or "").capitalize() or None),
+                Column("Level", lambda r: r.mastery_level, tip="Mastery level of the recipe"),
                 Column("Success", lambda r: r.success_rate, tables.rate),
+                Column("Rate from", lambda r: {"manual": "you", "estimated": "estimate"}.get(r.rate_source or "", r.rate_source),
+                       "Estimates come from the API model's rates at a similar level; set your own from the in-game Expected Probability tab"),
                 Column("Break-even rate", lambda r: r.break_even_rate, tables.rate,
                        "The success rate at which this craft earns nothing"),
                 Column("COMBO", lambda r: r.combo_probability, tables.rate),
@@ -284,6 +293,31 @@ class CraftingTab(QWidget):
         log = QPushButton("Log craft result…")
         log.clicked.connect(self._log)
         self._log_button = log
+        set_rate = QPushButton("Set my success rate…")
+        set_rate.clicked.connect(self._set_rate)
+        import_button = QPushButton("Import all recipes…")
+        import_button.clicked.connect(self._import)
+
+        # Filters for the (long) recipe list.
+        self.search = QLineEdit(placeholderText="Search recipes…")
+        self.search.setClearButtonEnabled(True)
+        self.search.textChanged.connect(self.mine.proxy.setFilterFixedString)
+        self.grade = QComboBox()
+        self.profession = QComboBox()
+        self.priced_only = QCheckBox("Only recipes with every material on the market")
+        self.priced_only.setChecked(True)
+        for widget in (self.grade, self.profession):
+            widget.currentIndexChanged.connect(self._filter)
+        self.priced_only.toggled.connect(self._filter)
+        self.counts = QLabel()
+        filters = QHBoxLayout()
+        filters.addWidget(self.search, 2)
+        filters.addWidget(QLabel("Grade"))
+        filters.addWidget(self.grade)
+        filters.addWidget(QLabel("Profession"))
+        filters.addWidget(self.profession)
+        filters.addWidget(self.priced_only)
+        filters.addWidget(self.counts, 1)
 
         self.note = QLabel()
         self.note.setWordWrap(True)
@@ -291,9 +325,10 @@ class CraftingTab(QWidget):
         layout.addWidget(QLabel("<b>API recipes</b> (rates at the API model's mastery)"))
         layout.addWidget(self.note)
         layout.addWidget(self.api, 3)
-        layout.addWidget(QLabel("<b>My recipes</b> (your own rates from the in-game Expected Probability tab)"))
-        layout.addWidget(self.mine, 2)
-        layout.addLayout(_buttons(add, edit, delete, log))
+        layout.addWidget(QLabel("<b>All recipes</b> (imported, plus your own; double-click to edit one you added)"))
+        layout.addLayout(filters)
+        layout.addWidget(self.mine, 4)
+        layout.addLayout(_buttons(import_button, add, edit, delete, set_rate, log))
         state.changed.connect(self.refresh)
 
     def _log(self) -> None:
@@ -324,10 +359,100 @@ class CraftingTab(QWidget):
 
     def refresh(self) -> None:
         self.api.set_rows(self.state.crafts, keep=lambda r: r.target_key)
-        self.mine.set_rows(self.state.recipes, keep=lambda r: r.recipe_id)
+        self._fill_filter(self.grade, sorted({r.grade for r in self.state.recipes if r.grade}, key=lambda g: GRADE_ORDER.get(g, 9)))
+        self._fill_filter(self.profession, sorted({(r.profession or "").capitalize() for r in self.state.recipes if r.profession}))
+        self._filter()
         self.note.setText(
             "" if self.state.crafts else "Craft data has not been fetched yet; it arrives with the next refresh."
         )
+
+    @staticmethod
+    def _fill_filter(box: QComboBox, values: list[str]) -> None:
+        current = box.currentText()
+        if [box.itemText(i) for i in range(1, box.count())] == values:
+            return
+        box.blockSignals(True)
+        box.clear()
+        box.addItem("All")
+        box.addItems(values)
+        box.setCurrentText(current if current in values else "All")
+        box.blockSignals(False)
+
+    def _filter(self) -> None:
+        grade, profession = self.grade.currentText(), self.profession.currentText()
+        rows = [
+            r for r in self.state.recipes
+            if (grade in ("", "All") or r.grade == grade)
+            and (profession in ("", "All") or (r.profession or "").capitalize() == profession)
+            and (not self.priced_only.isChecked() or r.materials is not None)
+        ]
+        self.mine.set_rows(rows, keep=lambda r: r.recipe_id)
+        imported = sum(r.imported for r in self.state.recipes)
+        self.counts.setText(
+            f"{len(rows)} shown of {len(self.state.recipes)} ({imported} imported)"
+            if self.state.recipes
+            else "No recipes yet: use Import all recipes."
+        )
+
+    def _import(self) -> None:
+        from app.db.recipes_import import import_graph
+
+        if self.state.server_id is None:
+            return
+        answer = QMessageBox.information(
+            self, "Import all recipes",
+            "Save this file with your browser first (open the link, then Ctrl+S):\n\n"
+            "https://gamers4.life/aion-2/database/crafting-graph.json\n\n"
+            "The app does not download it itself: that site's terms do not allow automated "
+            "access. Then pick the saved file. Importing again replaces the imported recipes "
+            "but keeps the success rates you set yourself.",
+            QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Cancel,
+        )
+        if answer != QMessageBox.StandardButton.Open:
+            return
+        path, _ = QFileDialog.getOpenFileName(self, "crafting-graph.json", "", "JSON files (*.json)")
+        if not path:
+            return
+        try:
+            result = import_graph(self.state.db, path, self.state.server_id)
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            QMessageBox.warning(self, "Import all recipes", f"Could not import that file: {exc}")
+            return
+        self.state.reload()
+        QMessageBox.information(
+            self, "Import all recipes",
+            f"Imported {result.recipes:,} recipes for your faction "
+            f"({result.skipped_other_race:,} of the other faction left out). "
+            + (f"Kept your own rate on {result.kept_own_rates}. " if result.kept_own_rates else "")
+            + "Success rates are estimates until you set your own.",
+        )
+
+    def _set_rate(self) -> None:
+        row = self.mine.selected()
+        if row is None:
+            QMessageBox.information(self, "Set my success rate", "Select a recipe first.")
+            return
+        dialog = QDialog(self)
+        dialog.setWindowTitle(f"Success rate: {row.name}")
+        rate = QDoubleSpinBox(minimum=0.01, maximum=100, decimals=2, suffix=" %")
+        rate.setValue(100 * (row.success_rate or 0.9))
+        combo = QDoubleSpinBox(minimum=0, maximum=100, decimals=2, suffix=" %")
+        combo.setValue(100 * (row.combo_probability or 0))
+        form = QFormLayout(dialog)
+        form.addRow("Success rate (in-game Expected Probability)", rate)
+        form.addRow("COMBO probability", combo)
+        box = QDialogButtonBox(QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel)
+        box.accepted.connect(dialog.accept)
+        box.rejected.connect(dialog.reject)
+        form.addRow(box)
+        if dialog.exec():
+            self.state.db.conn.execute(
+                "UPDATE recipes SET success_rate = ?, combo_probability = ?, rate_source = 'manual', "
+                "rate_updated_at = ? WHERE id = ?",
+                (rate.value() / 100, combo.value() / 100, utcnow().isoformat(), row.recipe_id),
+            )
+            self.state.db.conn.commit()
+            self.state.reload()
 
     def _dialog(self, recipe=None, inputs=()) -> None:
         if RecipeDialog(self.state, recipe, inputs, self).exec():
@@ -336,6 +461,9 @@ class CraftingTab(QWidget):
     def _edit(self) -> None:
         row = self.mine.selected()
         if row is None:
+            return
+        if row.imported:
+            self._set_rate()  # imported recipes: only the rates are yours to change
             return
         for recipe, inputs in self.state.db.recipes():
             if recipe["id"] == row.recipe_id:
