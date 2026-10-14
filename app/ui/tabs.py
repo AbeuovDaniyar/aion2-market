@@ -571,6 +571,9 @@ SETTINGS = [
         ("demand_reference_servers", "Demand-reference server ids (comma separated)", "text"),
         ("reference_refresh_hours", "Refresh reference servers every (hours)", "float"),
     ]),
+    ("Appearance", [
+        ("theme", "Theme (applies the next time the app starts)", ["dark", "light", "system"]),
+    ]),
     ("Item icons", [
         ("real_item_icons", "Fetch the game's item icons from NCSOFT's item dictionary (1 = on, 0 = off)", "float"),
     ]),

@@ -60,15 +60,16 @@ def main(argv: list[str] | None = None) -> int:
         source.close()
         db.close()
         return 0
+    theme = db.get_setting("theme") or "dark"
     db.close()
 
     from PySide6.QtWidgets import QApplication
 
-    from app.ui.main_window import MainWindow, style_charts
+    from app.ui.main_window import MainWindow, apply_theme
 
     app = QApplication(sys.argv[:1])
     app.setApplicationName("AION 2 Market Assistant")
-    style_charts(app)
+    apply_theme(app, theme)
     window = MainWindow(
         args.db,
         Aion2ExchangeSource,

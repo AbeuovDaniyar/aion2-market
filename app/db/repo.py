@@ -52,6 +52,7 @@ DEFAULT_SETTINGS: dict[str, str] = {
     "sanity_jump_factor": "5",
     "sanity_drop_factor": "0.2",
     "streak_risk": "0.05",  # the 1-in-20 bad streak
+    "theme": "dark",  # 'dark' | 'light' | 'system'; applies at the next start
     "real_item_icons": "1",  # fetch the game's item icons from NCSOFT's item dictionary
     # Alerts
     "alert_min_profit": "50000",  # toast for a flip or craft above this profit

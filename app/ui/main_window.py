@@ -275,6 +275,13 @@ class MainWindow(QMainWindow):
         super().closeEvent(event)
 
 
+def apply_theme(app: QApplication, theme: str = "dark") -> None:
+    """'dark', 'light' or 'system'. Call before any window is created."""
+    schemes = {"dark": Qt.ColorScheme.Dark, "light": Qt.ColorScheme.Light}
+    app.styleHints().setColorScheme(schemes.get(theme, Qt.ColorScheme.Unknown))
+    style_charts(app)
+
+
 def style_charts(app: QApplication) -> None:
     """Charts follow the system's light or dark palette."""
     palette = app.palette()
