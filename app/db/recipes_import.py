@@ -22,6 +22,9 @@ from app.external import models as m
 from app.external.aion2exchange import read_cached
 
 SOURCE = "gamers4.life crafting graph"
+KINA_ITEM = 930100030  # "Kina (All)" as an ingredient: a fee, not a market item
+# The graph's grade codes, checked against NCSOFT's dictionary grades.
+GRADE_CODES = {11: "Common", 21: "Rare", 31: "Legend", 41: "Unique", 51: "Epic"}
 # Faction -> the race key the graph uses.
 RACES = {"Elyos": "light", "Asmodian": "dark"}
 
@@ -31,6 +34,7 @@ class ImportResult:
     recipes: int
     skipped_other_race: int
     kept_own_rates: int
+    skipped_empty: int
     professions: dict[str, int]
 
 
@@ -62,10 +66,18 @@ def model_rates(db: Database, server_id: int) -> list[tuple[int, float]]:
     return sorted(pairs)
 
 
-def import_graph(db: Database, path: str | Path, server_id: int) -> ImportResult:
-    """Replace previously imported recipes with the file's, for this server's race.
+def import_graph(db: Database, source: str | Path | dict, server_id: int) -> ImportResult:
+    """Replace previously imported recipes with the graph's, for this server's race.
+    source is a file path, the file's text (pasted), or the parsed dict.
     Rates Danny set himself on an imported recipe are kept."""
-    graph = json.loads(Path(path).read_text(encoding="utf-8"))
+    if isinstance(source, dict):
+        graph = source
+    elif isinstance(source, str) and source.lstrip().startswith("{"):
+        graph = json.loads(source)
+    else:
+        graph = json.loads(Path(source).read_text(encoding="utf-8"))
+    if not isinstance(graph, dict):
+        raise ValueError("this is not crafting-graph.json")
     recipes, items = graph.get("recipes"), graph.get("items", {})
     if not isinstance(recipes, dict) or not recipes:
         raise ValueError("this file has no 'recipes'; is it crafting-graph.json?")
@@ -103,14 +115,15 @@ def import_graph(db: Database, path: str | Path, server_id: int) -> ImportResult
     for k, v in items.items():
         if str(k).isdigit() and isinstance(v, dict) and int(k) in named and v.get("g") is not None:
             votes.setdefault(v["g"], Counter())[named[int(k)]] += 1
-    grade_names = {code: c.most_common(1)[0][0] for code, c in votes.items()}
+    grade_names = dict(GRADE_CODES)
+    grade_names.update({code: c.most_common(1)[0][0] for code, c in votes.items()})
     db.conn.executemany(
         "UPDATE items SET grade = COALESCE(grade, ?) WHERE item_key = ?",
         [(grade_names[v["g"]], int(k)) for k, v in items.items()
          if str(k).isdigit() and isinstance(v, dict) and v.get("g") in grade_names],
     )
 
-    imported = other_race = kept = 0
+    imported = other_race = kept = skipped_empty = 0
     professions: Counter[str] = Counter()
     for recipe_id, r in recipes.items():
         if not str(recipe_id).isdigit() or not isinstance(r, dict) or not r.get("out"):
@@ -126,9 +139,17 @@ def import_graph(db: Database, path: str | Path, server_id: int) -> ImportResult
         else:
             rate, source, updated = estimated_rate(level, known), "estimated", now
         inputs: dict[int, int] = {}
+        kina_fee = int(r.get("gold") or 0)
         for line in r.get("in") or []:
-            if line and str(line[0]).isdigit() and line[1]:
-                inputs[int(line[0])] = inputs.get(int(line[0]), 0) + int(line[1])
+            if not line or not str(line[0]).isdigit() or not line[1]:
+                continue
+            if int(line[0]) == KINA_ITEM:
+                kina_fee += int(line[1])
+                continue
+            inputs[int(line[0])] = inputs.get(int(line[0]), 0) + int(line[1])
+        if not inputs and kina_fee == int(r.get("gold") or 0) and not r.get("in"):
+            skipped_empty += 1  # a COMBO or by-product entry, not a recipe you can craft
+            continue
         for key in [int(r["out"])] + ([int(r["combo"])] if r.get("combo") else []) + list(inputs):
             db.conn.execute("INSERT OR IGNORE INTO items (item_key) VALUES (?)", (key,))
         cursor = db.conn.execute(
@@ -137,7 +158,7 @@ def import_graph(db: Database, path: str | Path, server_id: int) -> ImportResult
             "rate_source, rate_updated_at, api_recipe_id, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 int(r["out"]), int(r.get("outq") or 1), rate, (r.get("cp") or 0) / 10000,
-                int(r["combo"]) if r.get("combo") else None, None, int(r.get("gold") or 0),
+                int(r["combo"]) if r.get("combo") else None, None, kina_fee,
                 r.get("p"), level, source, updated, api_id, SOURCE,
             ),
         )
@@ -149,4 +170,4 @@ def import_graph(db: Database, path: str | Path, server_id: int) -> ImportResult
         professions[r.get("p") or "unknown"] += 1
     db.conn.commit()
     db.set_setting("recipes_imported_at", now)
-    return ImportResult(imported, other_race, kept, dict(professions))
+    return ImportResult(imported, other_race, kept, skipped_empty, dict(professions))

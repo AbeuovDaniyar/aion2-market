@@ -1,4 +1,4 @@
-﻿"""Importing every recipe from a crafting-graph.json file the user saved."""
+"""Importing every recipe from a crafting-graph.json file the user saved."""
 
 from __future__ import annotations
 
@@ -92,9 +92,8 @@ def test_grades_are_learned_and_rows_are_valued(filled):
     views = service.item_views(db, SERVER, clock.at)
     rows = {r.name: r for r in service.recipe_rows(db, views)}
     green = rows["Green Thing"]
-    # Only Odyle and Refining Stone carry a dictionary grade (code 11 = Common); codes 21
-    # and 41 have no known item to learn from, so they stay unnamed.
-    assert green.grade is None and green.profession == "alchemy" and green.imported
+    # Code 21 has no dictionary item to learn from, so the built-in code table names it.
+    assert green.grade == "Rare" and green.profession == "alchemy" and green.imported
     assert green.materials == pytest.approx(3 * 1185 + 1 * 1700)
     assert "not_listed_here" in green.flags and "estimated_rate" in green.flags
 
@@ -104,3 +103,49 @@ def test_not_a_graph_file_is_refused(db, tmp_path):
     bad.write_text("{}", encoding="utf-8")
     with pytest.raises(ValueError):
         import_graph(db, bad, SERVER)
+
+
+# Entries copied from the real crafting-graph.json.
+REAL = {
+    "items": {
+        "110230015": {"n": "True Dragon Lord Longsword", "g": 41},
+        "110230096": {"n": "Splendent True Dragon Lord Longsword", "g": 41},
+        "110220006": {"n": "Splendent Noble Dragon Lord Longsword", "g": 51},
+        "510616001": {"n": "Mela Juice", "g": 11},
+        "510616003": {"n": "Artisan's Mela Juice", "g": 21},
+        "510616005": {"n": "Raydam Juice", "g": 11},
+        "610680045": {"n": "Mela", "g": 11},
+        "630554001": {"n": "Sugar (Bound)", "g": 11},
+        "930100030": {"n": "Kina (All)", "g": 11},
+    },
+    "recipes": {
+        "131012001": {"p": "blacksmithing", "qr": "light", "mg": "intermediate", "ml": 95, "gold": 0,
+                      "in": [], "out": "110220006", "outq": 1, "cp": 0, "combo": None},
+        "111013011": {"p": "blacksmithing", "qr": "light", "mg": "intermediate", "ml": 55, "gold": 4000,
+                      "in": [["110230015", 1, "111013001"], ["930100030", 1000000, None]],
+                      "out": "110230096", "outq": 1, "cp": 0, "combo": None},
+        "514075001": {"p": "cooking", "qr": "light", "mg": "beginner", "ml": 25, "gold": 800,
+                      "in": [["610680045", 5, None], ["630554001", 3, None]],
+                      "out": "510616003", "outq": 1, "cp": 3000, "combo": "510616003"},
+        "524076001": {"p": "cooking", "qr": "dark", "mg": "beginner", "ml": 1, "gold": 200,
+                      "in": [["610680051", 1, None], ["630554001", 1, None]],
+                      "out": "510616005", "outq": 1, "cp": 3000, "combo": "510616005"},
+    },
+}
+
+
+def test_real_entries_import_correctly(db):
+    db.conn.execute("INSERT INTO servers (id, api_server_id, name, faction) VALUES (12107, 12107, 'Ereshkigal', 'Asmodian')")
+    db.conn.execute("INSERT INTO servers (id, api_server_id, name, faction) VALUES (11304, 11304, 'X', 'Elyos')")
+    result = import_graph(db, json.dumps(REAL), 11304)  # pasted text works too
+    assert (result.recipes, result.skipped_other_race, result.skipped_empty) == (2, 1, 1)
+    recipes = {r["api_recipe_id"]: (r, i) for r, i in db.recipes()}
+    upgrade, inputs = recipes[111013011]
+    assert upgrade["kina_cost"] == 1_004_000  # the Kina ingredient is a fee
+    assert [(i["item_key"], i["qty"]) for i in inputs] == [(110230015, 1)]
+    assert upgrade["output_grade"] == "Unique"  # code 41: yellow
+    juice, _ = recipes[514075001]
+    assert juice["output_grade"] == "Rare" and juice["combo_probability"] == 0.3  # green
+
+    result = import_graph(db, REAL, 12107)  # Asmodian: the dark recipe instead
+    assert {r["api_recipe_id"] for r, _ in db.recipes()} == {524076001}

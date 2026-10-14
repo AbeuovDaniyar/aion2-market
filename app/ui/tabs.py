@@ -6,6 +6,7 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QCheckBox,
+    QApplication,
     QComboBox,
     QCompleter,
     QDialog,
@@ -399,30 +400,41 @@ class CraftingTab(QWidget):
 
         if self.state.server_id is None:
             return
-        answer = QMessageBox.information(
-            self, "Import all recipes",
-            "Save this file with your browser first (open the link, then Ctrl+S):\n\n"
+        box = QMessageBox(self)
+        box.setWindowTitle("Import all recipes")
+        box.setText(
+            "Open this link in your browser, then either copy the whole page (Ctrl+A, Ctrl+C) "
+            "or save it (Ctrl+S):\n\n"
             "https://gamers4.life/aion-2/database/crafting-graph.json\n\n"
             "The app does not download it itself: that site's terms do not allow automated "
-            "access. Then pick the saved file. Importing again replaces the imported recipes "
-            "but keeps the success rates you set yourself.",
-            QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Cancel,
+            "access. Importing again replaces the imported recipes but keeps the success "
+            "rates you set yourself."
         )
-        if answer != QMessageBox.StandardButton.Open:
-            return
-        path, _ = QFileDialog.getOpenFileName(self, "crafting-graph.json", "", "JSON files (*.json)")
-        if not path:
+        paste = box.addButton("Paste from clipboard", QMessageBox.ButtonRole.AcceptRole)
+        choose = box.addButton("Choose saved file…", QMessageBox.ButtonRole.AcceptRole)
+        box.addButton(QMessageBox.StandardButton.Cancel)
+        box.exec()
+        if box.clickedButton() is paste:
+            source = QApplication.clipboard().text()
+            if not source.strip().startswith("{"):
+                QMessageBox.warning(self, "Import all recipes", "The clipboard does not hold the recipe file. Copy the whole page first.")
+                return
+        elif box.clickedButton() is choose:
+            source, _ = QFileDialog.getOpenFileName(self, "crafting-graph.json", "", "JSON files (*.json)")
+            if not source:
+                return
+        else:
             return
         try:
-            result = import_graph(self.state.db, path, self.state.server_id)
+            result = import_graph(self.state.db, source, self.state.server_id)
         except (OSError, ValueError, KeyError, TypeError) as exc:
-            QMessageBox.warning(self, "Import all recipes", f"Could not import that file: {exc}")
-            return
-        self.state.reload()
+            QMessageBox.warning(self, "Import all recipes", f"Could not import that: {exc}")
+            return        self.state.reload()
         QMessageBox.information(
             self, "Import all recipes",
             f"Imported {result.recipes:,} recipes for your faction "
-            f"({result.skipped_other_race:,} of the other faction left out). "
+            f"({result.skipped_other_race:,} of the other faction and {result.skipped_empty:,} "
+            "COMBO-result entries left out). "
             + (f"Kept your own rate on {result.kept_own_rates}. " if result.kept_own_rates else "")
             + "Success rates are estimates until you set your own.",
         )
