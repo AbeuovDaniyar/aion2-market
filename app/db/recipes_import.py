@@ -13,6 +13,7 @@ Format (one entry per recipe id):
 from __future__ import annotations
 
 import json
+import sys
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
@@ -65,6 +66,28 @@ def model_rates(db: Database, server_id: int) -> list[tuple[int, float]]:
         return []
     pairs = {(s.mastery_level, s.success_rate) for p in cached.data.profiles for s in p.steps}
     return sorted(pairs)
+
+
+def bundled_graph() -> Path | None:
+    """The copy of the file packed into the exe (packaging/build.bat), if any."""
+    if not getattr(sys, "frozen", False):
+        return None
+    path = Path(getattr(sys, "_MEIPASS", "")) / "seed" / "crafting-graph.json"
+    return path if path.is_file() else None
+
+
+def ensure_recipes(db: Database, server_id: int, graph: Path | None = None) -> ImportResult | None:
+    """Import the bundled recipes when there are none yet or they are for the other race
+    (the server was changed). Does nothing without a bundled file."""
+    graph = graph or bundled_graph()
+    if graph is None:
+        return None
+    faction = db.conn.execute("SELECT faction FROM servers WHERE id = ?", (server_id,)).fetchone()
+    race = (RACES.get(faction["faction"]) if faction else None) or ""
+    has_recipes = db.conn.execute("SELECT 1 FROM recipes WHERE api_recipe_id IS NOT NULL LIMIT 1").fetchone()
+    if has_recipes and db.get_setting("recipes_race") == race:
+        return None
+    return import_graph(db, graph, server_id)
 
 
 def import_graph(db: Database, source: str | Path | dict, server_id: int) -> ImportResult:
@@ -196,4 +219,5 @@ def import_graph(db: Database, source: str | Path | dict, server_id: int) -> Imp
         professions[r.get("p") or "unknown"] += 1
     db.conn.commit()
     db.set_setting("recipes_imported_at", now)
+    db.set_setting("recipes_race", race or "")
     return ImportResult(imported, other_race, kept, combo_attached, orphans, dict(professions))

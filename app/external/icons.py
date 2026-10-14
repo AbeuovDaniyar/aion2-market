@@ -50,11 +50,15 @@ class IconFetcher:
         return self.db.get_setting("real_item_icons") == "1" and self._failures < 5
 
     def pending(self, server_id: int, limit: int = 5) -> list[tuple[int, str]]:
-        """Named items of this server that have not been looked up (or not recently)."""
+        """Named items of this server, or of a recipe, that have not been looked up (or
+        not recently)."""
         cutoff = (utcnow() - RETRY_MISSING_AFTER).isoformat()
         rows = self.db.conn.execute(
             "SELECT i.item_key, i.name FROM items i "
-            "JOIN (SELECT DISTINCT item_key FROM item_snapshots WHERE server_id = ?) s USING (item_key) "
+            "JOIN (SELECT item_key FROM item_snapshots WHERE server_id = ? "
+            "      UNION SELECT output_key FROM recipes "
+            "      UNION SELECT combo_output_key FROM recipes "
+            "      UNION SELECT item_key FROM recipe_inputs) s USING (item_key) "
             "LEFT JOIN item_icons c USING (item_key) "
             "WHERE i.name IS NOT NULL AND (c.item_key IS NULL OR (c.file IS NULL AND c.checked_at < ?)) "
             "ORDER BY i.watch DESC, i.name LIMIT ?",

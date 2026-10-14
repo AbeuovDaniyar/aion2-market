@@ -7,7 +7,7 @@ import json
 import pytest
 
 from app.analysis import service
-from app.db.recipes_import import estimated_rate, import_graph
+from app.db.recipes_import import ensure_recipes, estimated_rate, import_graph
 from app.external.scheduler import refresh_once
 from tests.conftest import ODYLE, SERVER
 
@@ -96,6 +96,16 @@ def test_grades_are_learned_and_rows_are_valued(filled):
     assert green.grade == "Rare" and green.profession == "alchemy" and green.imported
     assert green.materials == pytest.approx(3 * 1185 + 1 * 1700)
     assert "not_listed_here" in green.flags and "estimated_rate" in green.flags
+
+
+def test_bundled_recipes_import_once_and_again_after_a_race_change(filled):
+    db, _, path = filled
+    assert ensure_recipes(db, SERVER) is None  # not the packaged exe: no bundled file
+    assert ensure_recipes(db, SERVER, path).recipes == 2
+    assert ensure_recipes(db, SERVER, path) is None  # already there, same race
+    db.conn.execute("UPDATE servers SET faction = 'Asmodian' WHERE id = ?", (SERVER,))
+    result = ensure_recipes(db, SERVER, path)
+    assert result is not None and db.get_setting("recipes_race") == "dark"
 
 
 def test_not_a_graph_file_is_refused(db, tmp_path):

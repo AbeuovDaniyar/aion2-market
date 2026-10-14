@@ -56,6 +56,13 @@ def refresh_once(
         if server_id is None:
             return RefreshResult(now(), None, Freshness("down", now(), detail=str(exc)), error=str(exc))
 
+    try:
+        from app.db.recipes_import import ensure_recipes
+
+        ensure_recipes(db, server_id)
+    except (OSError, ValueError):
+        pass  # a broken bundled file leaves the recipes as they are
+
     freshness = source.freshness(server_id)
     items_updated = sales_updated = reference_updated = 0
     served_stale = False
