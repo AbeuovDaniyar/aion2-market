@@ -124,6 +124,37 @@ def _refresh_reference_servers(
     return updated
 
 
+def backfill_some(db: Database, source: PriceSource, server_id: int, limit: int = 2) -> int:
+    """Fetch 7 days of hourly price history for a few items that have none stored yet, so
+    the flip finder (which needs 3+ days) works without waiting days. One request per item,
+    once per item and server. Returns how many were filled."""
+    if db.get_setting("history_backfill") != "1":
+        return 0
+    rows = db.conn.execute(
+        "SELECT DISTINCT s.item_key FROM item_snapshots s "
+        "LEFT JOIN history_backfill b ON b.server_id = s.server_id AND b.item_key = s.item_key "
+        "LEFT JOIN items i ON i.item_key = s.item_key "
+        "WHERE s.server_id = ? AND b.item_key IS NULL ORDER BY i.watch DESC, s.item_key LIMIT ?",
+        (server_id, limit),
+    ).fetchall()
+    done = 0
+    for row in rows:
+        try:
+            prices = source.prices(row["item_key"], server_id, bucket="1h", days=7)
+        except SourceError:
+            break
+        if prices.stale:
+            break
+        db.save_price_series(server_id, prices.data)
+        db.conn.execute(
+            "INSERT OR REPLACE INTO history_backfill (server_id, item_key, at) VALUES (?, ?, ?)",
+            (server_id, row["item_key"], utcnow().isoformat()),
+        )
+        db.conn.commit()
+        done += 1
+    return done
+
+
 def load_item(db: Database, source: PriceSource, server_id: int, item_key: int) -> str | None:
     """On-demand detail for one item's charts: price history, sales days, depth ladder.
     Returns an error message, or None."""
@@ -144,6 +175,7 @@ class RefreshWorker(QThread):
     started_refresh = Signal()
     item_loaded = Signal(int, object)  # item_key, error message or None
     icons_loaded = Signal(int)  # how many item icons were just fetched
+    history_backfilled = Signal(int)  # how many items just got their 7-day price history
 
     def __init__(
         self,
@@ -183,18 +215,27 @@ class RefreshWorker(QThread):
                 minutes = max(10.0, db.get_float("refresh_minutes"))  # polite floor
                 self.next_refresh_at = utcnow() + timedelta(minutes=minutes)
                 self.refreshed.emit(result)
-                icons_pending = icons is not None and result.server_id is not None
+                server = result.server_id
+                backfill_pending = server is not None and result.freshness.state != "down"
+                icons_pending = icons is not None and server is not None
                 while True:
+                    busy = backfill_pending or icons_pending
                     try:
                         remaining = last + minutes * 60 - time.monotonic()
-                        # While icons are still missing, fetch a few between jobs.
-                        job = self._jobs.get(timeout=0.05 if icons_pending else max(0.0, remaining))
+                        # Background work runs a little at a time between jobs.
+                        job = self._jobs.get(timeout=0.05 if busy else max(0.0, remaining))
                     except queue.Empty:
-                        if icons_pending and remaining > 0:
-                            fetched = icons.fetch_some(result.server_id, 2)
-                            icons_pending = fetched > 0
-                            if fetched:
-                                self.icons_loaded.emit(fetched)
+                        if busy and remaining > 0:
+                            if backfill_pending:
+                                filled = backfill_some(db, source, server)
+                                backfill_pending = filled > 0
+                                if filled:
+                                    self.history_backfilled.emit(filled)
+                            elif icons_pending:
+                                fetched = icons.fetch_some(server, 2)
+                                icons_pending = fetched > 0
+                                if fetched:
+                                    self.icons_loaded.emit(fetched)
                             continue
                         break
                     if job[0] == "stop":

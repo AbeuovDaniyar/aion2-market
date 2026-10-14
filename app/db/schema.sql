@@ -90,3 +90,7 @@ CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, day TEXT, label TEXT,
 CREATE TABLE IF NOT EXISTS item_icons (
   item_key INTEGER PRIMARY KEY, file TEXT, grade TEXT, checked_at TEXT
 );
+-- Items whose 7-day price history was fetched once in the background, so flips work at once.
+CREATE TABLE IF NOT EXISTS history_backfill (
+  server_id INTEGER, item_key INTEGER, at TEXT, PRIMARY KEY (server_id, item_key)
+);

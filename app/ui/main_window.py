@@ -198,6 +198,10 @@ class MainWindow(QMainWindow):
         self.worker.refreshed.connect(self._refreshed)
         self.worker.item_loaded.connect(self.items.on_item_loaded)
         self.worker.icons_loaded.connect(self._icons_loaded)
+        # New history can turn up flips; recompute once the backfill pauses for a moment.
+        self._reload_soon = QTimer(self, singleShot=True, interval=3000)
+        self._reload_soon.timeout.connect(self.state.reload)
+        self.worker.history_backfilled.connect(lambda _: self._reload_soon.start())
 
         self.state.reload()  # show stored data before the first refresh returns
         self.worker.start()

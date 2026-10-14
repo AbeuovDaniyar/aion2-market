@@ -442,16 +442,22 @@ def build_alerts(
                     f"listings down {squeeze:.0f}% in {days:.0f} days while the price rose",
                 )
             )
-    threshold = db.get_float("alert_min_profit")
+    # Every listing the flip finder accepts (its profit and ROI minimums apply). The buy
+    # price is part of the id, so a new, cheaper listing of the same item alerts again.
+    mode = db.get_setting("flip_alerts") or "all"
     for flip in flip_rows:
-        if flip.confidence != "low" and max(flip.profit, flip.horizon_profit) >= threshold:
-            found.append(
-                alerts.Alert(
-                    "Flip", flip.item_key, flip.name or str(flip.item_key),
-                    f"buy at {flip.buy_price:,.0f}, resell near {flip.resale_target:,.0f} "
-                    f"({flip.profit:,.0f} profit per unit)",
-                )
+        if mode == "off" or (mode == "confident" and flip.confidence == "low"):
+            continue
+        found.append(
+            alerts.Alert(
+                "Flip", flip.item_key, flip.name or str(flip.item_key),
+                f"listed at {flip.buy_price:,.0f}, resells near {flip.resale_target:,.0f}: "
+                f"{flip.profit:,.0f} profit per unit after fees ({flip.roi_pct:.0f}% ROI, "
+                f"{flip.confidence} confidence)",
+                round(flip.buy_price),
             )
+        )
+    threshold = db.get_float("alert_min_profit")
     for row in craft_rows:
         if row.profit and row.profit.profit >= threshold and "low_confidence_price" not in row.flags:
             found.append(

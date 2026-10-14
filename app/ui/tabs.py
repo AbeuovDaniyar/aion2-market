@@ -570,6 +570,7 @@ SETTINGS = [
         ("region_gap_pct", "Gap that counts as cheap or expensive (%)", "float"),
         ("demand_reference_servers", "Demand-reference server ids (comma separated)", "text"),
         ("reference_refresh_hours", "Refresh reference servers every (hours)", "float"),
+        ("history_backfill", "Fetch 7 days of price history per item in the background (1 = on, 0 = off)", "float"),
     ]),
     ("Appearance", [
         ("theme", "Theme (applies the next time the app starts)", ["dark", "light", "system"]),
@@ -580,7 +581,8 @@ SETTINGS = [
     ("Alerts", [
         ("alert_toasts", "Desktop notifications (1 = on, 0 = off)", "float"),
         ("alert_sound", "Sound with notifications (1 = on, 0 = off)", "float"),
-        ("alert_min_profit", "Notify for a flip or craft above this profit (Kina)", "float"),
+        ("flip_alerts", "Notify when a listing can be flipped", ["all", "confident", "off"]),
+        ("alert_min_profit", "Notify for a craft above this profit (Kina)", "float"),
         ("dip_pct", "Watched-item dip below its 7-day median (%)", "float"),
         ("squeeze_drop_pct", "Supply squeeze: listings fell by (%)", "float"),
         ("squeeze_days", "Supply squeeze: over (days)", "float"),

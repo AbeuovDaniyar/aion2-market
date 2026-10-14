@@ -283,3 +283,47 @@ def test_timing_tab_reports_how_much_history_it_has(window, qapp):
     window.open_item(ODYLE)
     pump(qapp, lambda: window.items.status.text() == "")
     assert "need 2+ weeks" in window.items.timing_note.text()
+
+
+# -- flip notifications and history backfill ------------------------------------------------
+
+
+def test_backfill_fetches_each_item_once(filled, source, api):
+    from app.external.scheduler import backfill_some
+
+    db, _ = filled
+    total = 0
+    while (done := backfill_some(db, source, SERVER, 7)) > 0:
+        total += done
+    assert total == 20 and api["prices"].call_count == 20
+    assert "from=" in str(api["prices"].calls.last.request.url)
+    assert backfill_some(db, source, SERVER) == 0
+    db.set_setting("history_backfill", 0)
+    db.conn.execute("DELETE FROM history_backfill")
+    assert backfill_some(db, source, SERVER) == 0
+
+
+def flip_candidate(price, confidence="low"):
+    from app.analysis.flips import FlipCandidate
+
+    return FlipCandidate(ODYLE, "Odyle", price, 2000, 1800 - price, 50.0, 1, None, 0.0, confidence, "median_7d")
+
+
+def test_every_accepted_flip_alerts_and_a_cheaper_listing_alerts_again(filled):
+    db, clock = filled
+    views = service.item_views(db, SERVER, clock.at)
+    first = service.build_alerts(db, views, [flip_candidate(1000)], [], clock.at)
+    again = service.build_alerts(db, views, [flip_candidate(900)], [], clock.at)
+    [a], [b] = [x for x in first if x.kind == "Flip"], [x for x in again if x.kind == "Flip"]
+    assert "listed at 1,000" in a.message and "low confidence" in a.message
+    assert a.id != b.id  # a new, cheaper listing is a new alert
+
+
+def test_flip_alert_modes(filled):
+    db, clock = filled
+    views = service.item_views(db, SERVER, clock.at)
+    candidates = [flip_candidate(1000, "low")]
+    db.set_setting("flip_alerts", "confident")
+    assert not [a for a in service.build_alerts(db, views, candidates, [], clock.at) if a.kind == "Flip"]
+    db.set_setting("flip_alerts", "off")
+    assert not [a for a in service.build_alerts(db, views, [flip_candidate(1000, "high")], [], clock.at) if a.kind == "Flip"]

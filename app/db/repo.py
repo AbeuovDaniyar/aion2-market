@@ -55,7 +55,9 @@ DEFAULT_SETTINGS: dict[str, str] = {
     "theme": "dark",  # 'dark' | 'light' | 'system'; applies at the next start
     "real_item_icons": "1",  # fetch the game's item icons from NCSOFT's item dictionary
     # Alerts
-    "alert_min_profit": "50000",  # toast for a flip or craft above this profit
+    "flip_alerts": "all",  # 'all' flips the finder accepts | 'confident' (medium or high) | 'off'
+    "history_backfill": "1",  # fetch 7 days of price history once per item, in the background
+    "alert_min_profit": "50000",  # toast for a craft above this profit
     "dip_pct": "20",  # watched item this far below its 7-day median
     "squeeze_drop_pct": "40",  # listing count fell this much...
     "squeeze_days": "3",  # ...over this many days while the price rose
